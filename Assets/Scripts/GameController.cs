@@ -56,14 +56,15 @@ public class GameController : MonoBehaviour {
 	private void Start() {
 		spawnForm();
 		putRandomTransform();
-		makeWholeHole(xPlane);
-		makeHole(zPlane,Vector3.zero);
+		makeWholeHoleX(xPlane);
+		makeWholeHoleZ(zPlane);
+		//makeHole(zPlane,Vector3.zero);
 	}
 	
 	private void Update() {
 		if ( Input.GetKey(KeyCode.DownArrow) ) {
 			//putRandomTransform();
-			makeWholeHole(xPlane);
+			//makeWholeHole(xPlane);
 			//makeHole(zPlane);
 		}
 	}
@@ -77,11 +78,20 @@ public class GameController : MonoBehaviour {
 	//beggin
 	//Added by eduardo
 	
-	private void makeWholeHole(GameObject objPlane) {
+	private void makeWholeHoleZ(GameObject objPlane) {
 		makeHole(objPlane, Vector3.zero);
-		float mov = 2.0f;
-		while( mov < -2.0f ) { 
+		float mov = 4.0f;
+		while( mov < -4.0f ) { 
 			makeHole(objPlane, new Vector3(0.0f,0.0f,mov));
+			mov -= 0.3f;
+		}
+	}
+	
+	private void makeWholeHoleX(GameObject objPlane) {
+		makeHole(objPlane, Vector3.zero);
+		float mov = 4.0f;
+		while( mov < -4.0f ) { 
+			makeHole(objPlane, new Vector3(mov,0.0f,0.0f));
 			mov -= 0.3f;
 		}
 	}
