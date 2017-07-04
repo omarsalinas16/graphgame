@@ -104,6 +104,8 @@ public class GameController : MonoBehaviour {
 
 			if (meshFilter != null && mesh != null) {
 				meshFilter.sharedMesh = mesh;
+				meshFilter.sharedMesh.RecalculateNormals();
+				meshFilter.sharedMesh.RecalculateTangents();
 
 				//change mesh collider too.
 			}
