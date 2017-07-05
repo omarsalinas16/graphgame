@@ -23,6 +23,8 @@ public class GameController : MonoBehaviour {
 	private Vector3 newScale;
 	private Vector3 newRotation;
 	
+	public GameObject referenceCubes;
+	
 	public int transformAttempts {
 		get {
 			return _transformAttempts;
@@ -63,10 +65,26 @@ public class GameController : MonoBehaviour {
 	
 	private void Update() {
 		if ( Input.GetKey(KeyCode.DownArrow) ) {
-			//putRandomTransform();
-			//makeWholeHole(xPlane);
-			//makeHole(zPlane);
+			appearOrRotate(90,-90);
 		}
+		
+		if ( Input.GetKey(KeyCode.LeftArrow) ) {
+			appearOrRotate(0,90);
+		}
+	}
+	
+	private void appearOrRotate(int verAngle, int angle) {
+		if(referenceCubes.transform.eulerAngles.y == verAngle) {
+				referenceCubes.transform.Rotate(Vector3.up * angle);
+				referenceCubes.SetActive(true);
+		} else {
+			if(referenceCubes.activeSelf) {
+				referenceCubes.SetActive(false);
+			} else  {
+				referenceCubes.SetActive(true);
+			}
+		}
+			
 	}
 	
 	private void putRandomTransform() {
