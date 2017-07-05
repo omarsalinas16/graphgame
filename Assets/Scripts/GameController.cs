@@ -11,12 +11,14 @@ public class GameController : MonoBehaviour {
 	[Header("Requirements")]
 	[SerializeField]
 	private Transform formSpawn;
+	[SerializeField]
+	private GameObject referenceCubes;
 
 	[Header("Points")]
 	[SerializeField]
 	private int maxTransformAttempts = 5;
 	private int _transformAttempts;
-	
+
 	public int transformAttempts {
 		get {
 			return _transformAttempts;
@@ -62,6 +64,31 @@ public class GameController : MonoBehaviour {
 
 	private void Start() {
 		spawnForm();
+	}
+	
+	private void Update() {
+		if ( Input.GetKey(KeyCode.DownArrow) ) {
+			appearOrRotate(90, -90);
+		}
+		
+		if ( Input.GetKey(KeyCode.LeftArrow) ) {
+			appearOrRotate(0, 90);
+		}
+	}
+	
+	private void appearOrRotate(int verAngle, int angle) {
+		if (!referenceCubes) return;
+
+		if (referenceCubes.transform.eulerAngles.y == verAngle) {
+				referenceCubes.transform.Rotate(Vector3.up * angle);
+				referenceCubes.SetActive(true);
+		} else {
+			if (referenceCubes.activeSelf) {
+				referenceCubes.SetActive(false);
+			} else  {
+				referenceCubes.SetActive(true);
+			}
+		}
 	}
 
 	private void makeBothHoles() {
