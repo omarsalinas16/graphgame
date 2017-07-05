@@ -17,12 +17,6 @@ public class GameController : MonoBehaviour {
 	private int maxTransformAttempts = 5;
 	private int _transformAttempts;
 	
-	public GameObject xPlane;
-	public GameObject zPlane;
-	private Vector3 newPosition;
-	private Vector3 newScale;
-	private Vector3 newRotation;
-	
 	public int transformAttempts {
 		get {
 			return _transformAttempts;
@@ -36,6 +30,19 @@ public class GameController : MonoBehaviour {
 			}
 		}
 	}
+
+	[Header("Planes")]
+	[SerializeField]
+	private Transform xPlane;
+	[SerializeField]
+	private Transform zPlane;
+
+	[SerializeField]
+	private float axisPositionMin = -3.0f;
+	[SerializeField]
+	private float axisPositionMax = 3.0f;
+	[SerializeField]
+	private float axisStep = 0.3f;
 
 	[Header("Shapes")]
 	[SerializeField]
@@ -55,111 +62,57 @@ public class GameController : MonoBehaviour {
 
 	private void Start() {
 		spawnForm();
-		putRandomTransform();
-		makeWholeHoleX(xPlane);
-		makeWholeHoleZ(zPlane);
-		//makeHole(zPlane,Vector3.zero);
+	}
+
+	private void makeBothHoles() {
+		makeHole(xPlane, Vector3.right);
+		makeHole(zPlane, Vector3.forward);
 	}
 	
-	private void Update() {
-		if ( Input.GetKey(KeyCode.DownArrow) ) {
-			//putRandomTransform();
-			//makeWholeHole(xPlane);
-			//makeHole(zPlane);
+	private void makeHole(Transform plane, Vector3 moveAxis) {
+		Vector3 originalPos = plane.position;
+		float axisPosition = axisPositionMax;
+
+		Mesh mesh = null;
+
+		while (axisPosition > axisPositionMin) {
+			plane.position = moveAxis * axisPosition;
+			mesh = CSG.Subtract(plane.gameObject, activeForm.gameObject);
+
+			MeshFilter meshFilter = plane.GetComponent<MeshFilter>();
+
+			if (meshFilter != null && mesh != null) {
+				meshFilter.sharedMesh = mesh;
+				meshFilter.sharedMesh.RecalculateNormals();
+				meshFilter.sharedMesh.RecalculateTangents();
+
+				//change mesh collider too.
+			}
+
+			plane.position = originalPos;
+			plane.localScale = Vector3.one;
+
+			axisPosition -= axisStep;
 		}
 	}
-	
-	private void putRandomTransform() {
-		//reposition();
-		rescale();
-		rotateRandom();
-	}
-	
-	//beggin
-	//Added by eduardo
-	
-	private void makeWholeHoleZ(GameObject objPlane) {
-		makeHole(objPlane, Vector3.zero);
-		float mov = 4.0f;
-		while( mov < -4.0f ) { 
-			makeHole(objPlane, new Vector3(0.0f,0.0f,mov));
-			mov -= 0.3f;
-		}
-	}
-	
-	private void makeWholeHoleX(GameObject objPlane) {
-		makeHole(objPlane, Vector3.zero);
-		float mov = 4.0f;
-		while( mov < -4.0f ) { 
-			makeHole(objPlane, new Vector3(mov,0.0f,0.0f));
-			mov -= 0.3f;
-		}
-	}
-	
-	private void makeHole(GameObject objPlane,Vector3 positionMov) {
-		GameObject form = activeForm.gameObject;
-		Vector3 originalPos = objPlane.transform.position;
-		objPlane.transform.position = positionMov;
-		
-		Mesh m = CSG.Subtract(objPlane, form);
-		
-		objPlane.GetComponent<MeshFilter>().sharedMesh = m;
-		
-		objPlane.transform.position = originalPos;
-		objPlane.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-	}
-	
-	private void reposition() {
-		GameObject form = activeForm.gameObject;
-		newPosition = new Vector3(
-								putRandomPosition(), 
-								putRandomPosition(), 
-								putRandomPosition());
-		form.transform.position = newPosition;
-	}
-	
-	private void rescale() {
-		GameObject form = activeForm.gameObject;
-		newScale = new Vector3(
-								putRandomPosition(), 
-								putRandomPosition(), 
-								putRandomPosition());
-		form.transform.localScale = newScale;
-	}
-	
-	private void rotateRandom() {
-		GameObject form = activeForm.gameObject;
-		form.transform.RotateAround(Vector3.up,putRandomPosition());
-		form.transform.RotateAround(Vector3.right,putRandomPosition());
-		form.transform.RotateAround(Vector3.forward,putRandomPosition());
-	}
-	
-	private float putRandomPosition() {
-		float randomN = Mathf.Round(Random.Range(-2.0f, 2.0f));
-		if(randomN == 0)
-			randomN = 0.5f;
-		randomN = Mathf.Abs(randomN);
-		return randomN;
-	}
-	//end
-	
-	
 
 	public void initTransformAttempts() {
 		transformAttempts = maxTransformAttempts;
 	}
 
 	private void spawnForm() {
+		instantiateForm();
+		setFormToSolution();
+		makeBothHoles();
+		fadeInForm();
+		setFormToIdentity();
+	}
+
+	private void instantiateForm() {
 		if (forms.Length > 0 && shapeIndex >= 0) {
 			Form selectedForm = forms[shapeIndex];
 
 			activeForm = Instantiate(selectedForm.shape, formSpawn.position, Quaternion.identity, formSpawn);
-			
-			if (activeForm) {
-				if (FormBehaviour.Instance) {
-					FormBehaviour.Instance.fadeIn(activeForm);
-				}
-			}
 
 			if (PlayerController.Instance) {
 				PlayerController.Instance.setActiveForm(getActiveForm());
@@ -168,9 +121,31 @@ public class GameController : MonoBehaviour {
 			initTransformAttempts();
 		}
 	}
-	
-	
 
+	private void setFormToSolution() {
+		if (activeForm && forms[shapeIndex] != null) {
+			activeForm.localPosition = forms[shapeIndex].position;
+			activeForm.Rotate(forms[shapeIndex].rotation);
+			activeForm.localScale = forms[shapeIndex].scale;
+		}
+	}
+
+	private void setFormToIdentity() {
+		if (activeForm) {
+			activeForm.localPosition = Vector3.zero;
+			activeForm.rotation = Quaternion.identity;
+			activeForm.localScale = Vector3.one;
+		}
+	}
+
+	private void fadeInForm() {
+		if (activeForm) {
+			if (FormBehaviour.Instance) {
+				FormBehaviour.Instance.fadeIn(activeForm);
+			}
+		}
+	}
+	
 	private void endCurrentLevel() {
 		Debug.Log("WIN");
 
@@ -180,7 +155,7 @@ public class GameController : MonoBehaviour {
 
 		if (shapeIndex < forms.Length - 1) {
 			shapeIndex++;
-			spawnForm();
+			instantiateForm();
 		}
 	}
 
