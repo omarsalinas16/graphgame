@@ -33,9 +33,9 @@ public class GameController : MonoBehaviour {
 
 	[Header("Planes")]
 	[SerializeField]
-	private Transform xPlane;
+	public Transform xPlane;
 	[SerializeField]
-	private Transform zPlane;
+	public Transform zPlane;
 
 	[SerializeField]
 	private float axisPositionMin = -3.0f;
