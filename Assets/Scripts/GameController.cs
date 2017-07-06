@@ -35,9 +35,9 @@ public class GameController : MonoBehaviour {
 
 	[Header("Planes")]
 	[SerializeField]
-	public Transform xPlane;
+	private Transform xPlane;
 	[SerializeField]
-	public Transform zPlane;
+	private Transform zPlane;
 
 	[SerializeField]
 	private float axisPositionMin = -3.0f;
@@ -67,11 +67,11 @@ public class GameController : MonoBehaviour {
 	}
 	
 	private void Update() {
-		if ( Input.GetKey(KeyCode.DownArrow) ) {
+		if (Input.GetKeyDown(KeyCode.DownArrow) ) {
 			appearOrRotate(90, -90);
 		}
 		
-		if ( Input.GetKey(KeyCode.LeftArrow) ) {
+		if (Input.GetKeyDown(KeyCode.LeftArrow) ) {
 			appearOrRotate(0, 90);
 		}
 	}
