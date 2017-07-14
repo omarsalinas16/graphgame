@@ -64,15 +64,58 @@ public class GameController : MonoBehaviour {
 
 	private void Start() {
 		spawnForm();
+		
+		 startPos = xPlane.position;
+		distance = 6.0f;
+		 endPos = startPos + Vector3.right * distance;
+		
+		lerpTime = 5;
+		currentLerpTime = 0.0f;
+		startMove = false;	
+		startMoveZ = false;
 	}
+	
+	Vector3 startPos;
+	Vector3 endPos;
+	float distance;
+	float lerpTime;
+	float currentLerpTime;
+	bool startMove;
+	bool startMoveZ;
+			
 	
 	private void Update() {
 		if (Input.GetKeyDown(KeyCode.DownArrow) ) {
-			appearOrRotate(90, -90);
+			startMove = true;
+			//appearOrRotate(90, -90);
+		}
+		if(startMove) {
+			currentLerpTime += Time.deltaTime;
+			if(currentLerpTime >= lerpTime) {
+				currentLerpTime = lerpTime;
+				startPos = zPlane.position;
+				endPos = startPos - Vector3.forward * distance;
+				currentLerpTime = 0;
+				startMove = false;
+				startMoveZ = true;
+				
+			} else {
+				float perc = currentLerpTime / lerpTime;
+				xPlane.position = Vector3.Lerp(startPos,endPos,perc);
+			}
+		}
+		if(startMoveZ) {
+			currentLerpTime += Time.deltaTime;
+			if(currentLerpTime >= lerpTime) {
+				currentLerpTime = lerpTime;
+				startMove = false;
+			}
+			float perc = currentLerpTime / lerpTime;
+			zPlane.position = Vector3.Lerp(startPos,endPos,perc);
 		}
 		
 		if (Input.GetKeyDown(KeyCode.LeftArrow) ) {
-			appearOrRotate(0, 90);
+			//appearOrRotate(0, 90);
 		}
 	}
 	
