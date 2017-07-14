@@ -156,8 +156,6 @@ public class LookAtCamera : MonoBehaviour {
 		lookAngleY = startAngle.eulerAngles.y;
 
 		transformTargetRot = Quaternion.Euler(lookAngleX, lookAngleY, 0f);
-
-		// shakeCamera(0.2f, 0.25f);
 	}
 
 	public void shakeCamera(float amount, float duration) {

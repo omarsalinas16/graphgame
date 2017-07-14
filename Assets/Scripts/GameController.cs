@@ -46,6 +46,11 @@ public class GameController : MonoBehaviour {
 	[SerializeField]
 	private float axisStep = 0.3f;
 
+	private PlaneBehaviour xPlaneBehaviour;
+	private PlaneBehaviour zPlaneBehaviour;
+
+	private bool movePlanes = false;
+
 	[Header("Shapes")]
 	[SerializeField]
 	private string formTag = "Form";
@@ -64,58 +69,35 @@ public class GameController : MonoBehaviour {
 
 	private void Start() {
 		spawnForm();
-		
-		 startPos = xPlane.position;
-		distance = 6.0f;
-		 endPos = startPos + Vector3.right * distance;
-		
-		lerpTime = 5;
-		currentLerpTime = 0.0f;
-		startMove = false;	
-		startMoveZ = false;
+
+		if (xPlane) {
+			xPlaneBehaviour = xPlane.GetComponent<PlaneBehaviour>();
+		}
+
+		if (zPlane) {
+			zPlaneBehaviour = zPlane.GetComponent<PlaneBehaviour>();
+		}
 	}
-	
-	Vector3 startPos;
-	Vector3 endPos;
-	float distance;
-	float lerpTime;
-	float currentLerpTime;
-	bool startMove;
-	bool startMoveZ;
-			
 	
 	private void Update() {
 		if (Input.GetKeyDown(KeyCode.DownArrow) ) {
-			startMove = true;
-			//appearOrRotate(90, -90);
+			movePlanes = true;
 		}
-		if(startMove) {
-			currentLerpTime += Time.deltaTime;
-			if(currentLerpTime >= lerpTime) {
-				currentLerpTime = lerpTime;
-				startPos = zPlane.position;
-				endPos = startPos - Vector3.forward * distance;
-				currentLerpTime = 0;
-				startMove = false;
-				startMoveZ = true;
-				
-			} else {
-				float perc = currentLerpTime / lerpTime;
-				xPlane.position = Vector3.Lerp(startPos,endPos,perc);
+
+		if (movePlanes) {
+			if (!xPlaneBehaviour.allowMovement) {
+				xPlaneBehaviour.allowMovement = true;
 			}
-		}
-		if(startMoveZ) {
-			currentLerpTime += Time.deltaTime;
-			if(currentLerpTime >= lerpTime) {
-				currentLerpTime = lerpTime;
-				startMove = false;
+
+			if (xPlaneBehaviour.hasEnded && !xPlaneBehaviour.hasCollided) {
+				if (!zPlaneBehaviour.allowMovement) {
+					zPlaneBehaviour.allowMovement = true;
+				}
 			}
-			float perc = currentLerpTime / lerpTime;
-			zPlane.position = Vector3.Lerp(startPos,endPos,perc);
-		}
-		
-		if (Input.GetKeyDown(KeyCode.LeftArrow) ) {
-			//appearOrRotate(0, 90);
+
+			if (zPlaneBehaviour.hasEnded) {
+				movePlanes = false;
+			}
 		}
 	}
 	
