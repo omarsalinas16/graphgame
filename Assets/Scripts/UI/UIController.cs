@@ -142,7 +142,7 @@ public class UIController : MonoBehaviour {
 		}
 
 		if (LookAtCamera.Instance) {
-			LookAtCamera.Instance.ResetCameraPosition();
+			LookAtCamera.Instance.resetCameraPosition();
 		}
 	}
 }

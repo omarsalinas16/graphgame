@@ -106,14 +106,22 @@ public class GameController : MonoBehaviour {
 			plane.position = moveAxis * axisPosition;
 			mesh = CSG.Subtract(plane.gameObject, activeForm.gameObject);
 
-			MeshFilter meshFilter = plane.GetComponent<MeshFilter>();
+			if (mesh != null) {
+				mesh.name = "Generated Mesh";
+				mesh.RecalculateNormals();
+				mesh.RecalculateTangents();
 
-			if (meshFilter != null && mesh != null) {
-				meshFilter.sharedMesh = mesh;
-				meshFilter.sharedMesh.RecalculateNormals();
-				meshFilter.sharedMesh.RecalculateTangents();
+				MeshFilter meshFilter = plane.GetComponent<MeshFilter>();
 
-				//change mesh collider too.
+				if (meshFilter != null) {
+					meshFilter.sharedMesh = mesh;
+				}
+
+				MeshCollider planeCollider = plane.GetComponent<MeshCollider>();
+
+				if (planeCollider != null) {
+					planeCollider.sharedMesh = mesh;
+				}
 			}
 
 			plane.position = originalPos;

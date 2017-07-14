@@ -36,13 +36,16 @@ public class LookAtCamera : MonoBehaviour {
 	[SerializeField]
 	private float maxZoom = 10.0f;
 
+	[Header("Camera Shake")]
+	[SerializeField]
+	private float shakeAmount = 2.0f;
+	private Vector3 lastCameraLocalPosition;
+
 	[Header("Cursor")]
 	[SerializeField]
 	private bool lockCursor = false;
-
-	[SerializeField]
+	
 	private float lookAngleX;
-	[SerializeField]
 	private float lookAngleY;
 	private Quaternion transformTargetRot;
 	
@@ -81,7 +84,7 @@ public class LookAtCamera : MonoBehaviour {
 				Cursor.visible = !lockCursor;
 			}
 
-			HandleRotationMovement();
+			handleRotationMovement();
 		} else {
 			if (lockCursor) {
 				Cursor.lockState = lockCursor ? CursorLockMode.Confined : CursorLockMode.None;
@@ -93,7 +96,7 @@ public class LookAtCamera : MonoBehaviour {
 		}
 
 		if (allowInput) {
-			HandleScrollZoom();
+			handleScrollZoom();
 		}
 	}
 
@@ -103,7 +106,7 @@ public class LookAtCamera : MonoBehaviour {
 		allowInput = false;
 	}
 
-	private void HandleRotationMovement() {
+	private void handleRotationMovement() {
 		if (Time.timeScale < float.Epsilon)
 			return;
 
@@ -131,7 +134,7 @@ public class LookAtCamera : MonoBehaviour {
 		}
 	}
 
-	private void HandleScrollZoom() {
+	private void handleScrollZoom() {
 		if (Time.timeScale < float.Epsilon || mainCamera == null)
 			return;
 
@@ -148,10 +151,36 @@ public class LookAtCamera : MonoBehaviour {
 		}
 	}
 
-	public void ResetCameraPosition() {
+	public void resetCameraPosition() {
 		lookAngleX = startAngle.eulerAngles.x;
 		lookAngleY = startAngle.eulerAngles.y;
 
 		transformTargetRot = Quaternion.Euler(lookAngleX, lookAngleY, 0f);
+
+		// shakeCamera(0.2f, 0.25f);
+	}
+
+	public void shakeCamera(float amount, float duration) {
+		shakeAmount = amount;
+		lastCameraLocalPosition = mainCamera.transform.localPosition;
+
+		InvokeRepeating("beginShake", 0.0f, 0.01f);
+		Invoke("stopShake", duration);
+	}
+
+	private void beginShake() {
+		if (shakeAmount > 0.0f) {
+			Vector3 cameraShakePosition = mainCamera.transform.position;
+
+			cameraShakePosition.x += Random.value * shakeAmount * 2 - shakeAmount;
+			cameraShakePosition.z += Random.value * shakeAmount * 2 - shakeAmount;
+
+			mainCamera.transform.position = cameraShakePosition;
+		}
+	}
+
+	private void stopShake() {
+		CancelInvoke("beginShake");
+		mainCamera.transform.localPosition = lastCameraLocalPosition;
 	}
 }
