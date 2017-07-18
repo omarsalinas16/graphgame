@@ -50,6 +50,13 @@ public class LookAtCamera : MonoBehaviour {
 	private Quaternion transformTargetRot;
 	
 	private float transformTargetScroll;
+	
+	[SerializeField]
+	private GameObject lines;
+	private GameObject instLines;
+	
+	[SerializeField]
+	private Transform target;
 
 	private void Awake() {
 		if (Instance != null && Instance != this)
@@ -75,6 +82,34 @@ public class LookAtCamera : MonoBehaviour {
 	}
 
 	private void Update() {
+		
+		if (Input.GetKey("z") ) {
+			if(!instLines) {
+				instLines = Instantiate(lines,transform.position,Quaternion.identity);
+			}
+			transform.rotation = Quaternion.identity;
+			return;
+		}
+		else if (Input.GetKey("x") ) {
+			 Quaternion rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+			if(!instLines) {
+				instLines = Instantiate(lines,transform.position,rotation);
+			}
+			transform.rotation = rotation;
+			return;
+		}
+		else if (Input.GetKey("s") ) {
+			 Quaternion rotation = Quaternion.Euler(new Vector3(0, -90, 0));
+			if(!instLines) {
+				instLines = Instantiate(lines,transform.position,rotation);
+			}
+			transform.rotation = rotation;
+			return;
+		}
+		else if(instLines) {
+			Destroy(instLines);
+		}
+		
 		if (Time.timeScale < float.Epsilon)
 			return;
 
