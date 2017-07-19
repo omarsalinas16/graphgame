@@ -11,8 +11,6 @@ public class GameController : MonoBehaviour {
 	[Header("Requirements")]
 	[SerializeField]
 	private Transform formSpawn;
-	[SerializeField]
-	private GameObject referenceCubes;
 
 	[Header("Points")]
 	[SerializeField]
@@ -38,10 +36,6 @@ public class GameController : MonoBehaviour {
 	private Transform xPlane;
 	[SerializeField]
 	private Transform zPlane;
-	[SerializeField]
-	private GameObject xPlaneGO;
-	[SerializeField]
-	private GameObject zPlaneGO;
 
 	[SerializeField]
 	private float axisPositionMin = -3.0f;
@@ -58,6 +52,8 @@ public class GameController : MonoBehaviour {
 	[Header("Shapes")]
 	[SerializeField]
 	private string formTag = "Form";
+	[SerializeField]
+	private float scaleOffsetFix = 0.05f;
 	[SerializeField]
 	private Form[] forms;
 	private Transform activeForm;
@@ -82,9 +78,9 @@ public class GameController : MonoBehaviour {
 			zPlaneBehaviour = zPlane.GetComponent<PlaneBehaviour>();
 		}
 	}
-	
+
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.DownArrow) ) {
+		if (Input.GetKeyDown(KeyCode.DownArrow)) {
 			movePlanes = true;
 		}
 
@@ -104,65 +100,49 @@ public class GameController : MonoBehaviour {
 			}
 		}
 	}
-	
-	private void appearOrRotate(int verAngle, int angle) {
-		if (!referenceCubes) return;
-
-		if (referenceCubes.transform.eulerAngles.y == verAngle) {
-				referenceCubes.transform.Rotate(Vector3.up * angle);
-				referenceCubes.SetActive(true);
-		} else {
-			if (referenceCubes.activeSelf) {
-				referenceCubes.SetActive(false);
-			} else  {
-				referenceCubes.SetActive(true);
-			}
-		}
-	}
 
 	private void makeBothHoles() {
-		makeHole(xPlaneGO, Vector3.right);
-		makeHole(zPlaneGO, Vector3.forward);
+		makeHole(xPlane, Vector3.right);
+		makeHole(zPlane, Vector3.forward);
 	}
-	
-	private void makeHole(GameObject plane, Vector3 moveAxis) {
-		Vector3 originalPos = plane.transform.position;
+
+	private void makeHole(Transform plane, Vector3 moveAxis) {
+		GameObject planeGO = plane.gameObject;
+		Vector3 originalPos = plane.position;
 		float axisPosition = axisPositionMax;
 
 		Mesh mesh = null;
 
 		while (axisPosition > axisPositionMin) {
-			plane.transform.position = moveAxis * axisPosition;
-			mesh = CSG.Subtract(plane.gameObject, activeForm.gameObject);
+			plane.position = moveAxis * axisPosition;
+			mesh = CSG.Subtract(planeGO, activeForm.gameObject);
 
 			if (mesh != null) {
 				mesh.name = "Generated Mesh";
 				mesh.RecalculateNormals();
 				mesh.RecalculateTangents();
 
-				MeshFilter meshFilter = plane.GetComponent<MeshFilter>();
+				MeshFilter meshFilter = planeGO.GetComponent<MeshFilter>();
 
 				if (meshFilter != null) {
-					//meshFilter.sharedMesh = null;
-					DestroyImmediate(plane.GetComponent<MeshFilter>());
-					MeshFilter filter = plane.AddComponent<MeshFilter>();
-					//meshFilter.sharedMesh = mesh;
+					DestroyImmediate(planeGO.GetComponent<MeshFilter>());
+					MeshFilter filter = planeGO.AddComponent<MeshFilter>();
+
 					filter.sharedMesh = mesh;
 				}
 
-				MeshCollider planeCollider = plane.GetComponent<MeshCollider>();
+				MeshCollider planeCollider = planeGO.GetComponent<MeshCollider>();
 
 				if (planeCollider != null) {
-					//planeCollider.sharedMesh = null;
-					DestroyImmediate(plane.GetComponent<MeshCollider>());
-					MeshCollider collider = plane.AddComponent<MeshCollider>();
-					//planeCollider.sharedMesh = mesh;
+					DestroyImmediate(planeGO.GetComponent<MeshCollider>());
+					MeshCollider collider = planeGO.AddComponent<MeshCollider>();
+
 					collider.sharedMesh = mesh;
 				}
 			}
 
-			plane.transform.position = originalPos;
-			plane.transform.localScale = Vector3.one;
+			plane.position = originalPos;
+			plane.localScale = Vector3.one;
 
 			axisPosition -= axisStep;
 		}
@@ -198,7 +178,9 @@ public class GameController : MonoBehaviour {
 		if (activeForm && forms[shapeIndex] != null) {
 			activeForm.localPosition = forms[shapeIndex].position;
 			activeForm.Rotate(forms[shapeIndex].rotation);
-			activeForm.localScale = forms[shapeIndex].scale;
+
+			// Temporal scale fix for plane colliders.
+			activeForm.localScale = forms[shapeIndex].scale + new Vector3(scaleOffsetFix, scaleOffsetFix, scaleOffsetFix);
 		}
 	}
 
@@ -217,7 +199,7 @@ public class GameController : MonoBehaviour {
 			}
 		}
 	}
-	
+
 	private void endCurrentLevel() {
 		Debug.Log("WIN");
 

@@ -10,10 +10,11 @@ public class LookAtCamera : MonoBehaviour {
 	private Camera mainCamera;
 	private Quaternion startAngle;
 
-	[Header("Turning")]
 	[SerializeField]
 	private bool allowInput = true;
+	private bool rotatingFixed = false;
 
+	[Header("Turning")]
 	[SerializeField]
 	[Range(1.0f, 10.0f)]
 	private float turnSpeed = 1.0f;
@@ -44,16 +45,12 @@ public class LookAtCamera : MonoBehaviour {
 	[Header("Cursor")]
 	[SerializeField]
 	private bool lockCursor = false;
-	
+
 	private float lookAngleX;
 	private float lookAngleY;
 	private Quaternion transformTargetRot;
-	
+
 	private float transformTargetScroll;
-	
-	
-	[SerializeField]
-	private Transform target;
 
 	private void Awake() {
 		if (Instance != null && Instance != this)
@@ -76,16 +73,16 @@ public class LookAtCamera : MonoBehaviour {
 		lookAngleY = startAngle.eulerAngles.y;
 
 		transformTargetScroll = mainCamera.orthographicSize;
-		rotatingFixed = false;
 	}
 
 	private void Update() {
-		
-		if(rotatingFixed)
+		if (Time.timeScale < float.Epsilon) {
 			return;
-		
-		if (Time.timeScale < float.Epsilon)
+		}
+
+		if (rotatingFixed) {
 			return;
+		}
 
 		if (Input.GetButton("Fire1") && allowInput) {
 			if (lockCursor) {
@@ -190,15 +187,13 @@ public class LookAtCamera : MonoBehaviour {
 		CancelInvoke("beginShake");
 		mainCamera.transform.localPosition = lastCameraLocalPosition;
 	}
-	
-	bool rotatingFixed;
+
 	public void fixedRotation(Quaternion q) {
-		transform.rotation = q;
+		transform.localRotation = q;
 		rotatingFixed = true;
 	}
-	
+
 	public void setRotatingFixed(bool b) {
 		rotatingFixed = b;
 	}
-	
 }

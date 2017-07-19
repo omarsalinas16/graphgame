@@ -57,12 +57,6 @@ public class PlayerController : MonoBehaviour {
 
 	private Vector3 targetScale;
 	private bool hasBeenScaled = false;
-	
-	[SerializeField]
-	private GameObject lines;
-	//
-	private GameObject instLines;
-
 
 	private void Awake() {
 		if (Instance != null && Instance != this)
@@ -70,46 +64,16 @@ public class PlayerController : MonoBehaviour {
 
 		Instance = this;
 	}
-	
+
 	private void Update() {
-		//appearReferenceLines();
 		doTranslate();
 		doRotation();
 		doScaling();
 	}
-	
-	private void appearReferenceLines() {
-		if (Input.GetKey("z") ) {
-			if(!instLines) {
-				instLines = Instantiate(lines,transform.position,Quaternion.identity);
-			}
-			transform.rotation = Quaternion.identity;
-			return;
-		}
-		else if (Input.GetKey("x") ) {
-			 Quaternion rotation = Quaternion.Euler(new Vector3(90, 0, 0));
-			if(!instLines) {
-				instLines = Instantiate(lines,transform.position,rotation);
-			}
-			transform.rotation = rotation;
-			return;
-		}
-		else if (Input.GetKey("s") ) {
-			 Quaternion rotation = Quaternion.Euler(new Vector3(0, -90, 0));
-			if(!instLines) {
-				instLines = Instantiate(lines,transform.position,rotation);
-			}
-			transform.rotation = rotation;
-			return;
-		}
-		else if(instLines) {
-			Destroy(instLines);
-		}
-	}
 
 	public void setActiveForm(Transform form) {
 		activeForm = form;
-		
+
 		hasBeenTranslated = false;
 		hasBeenRotated = false;
 		hasBeenScaled = false;

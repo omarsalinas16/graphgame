@@ -63,7 +63,7 @@ public class PlaneBehaviour : MonoBehaviour {
 		targetPosition = startPosition + direction * (distanceToMove - planeWidth);
 	}
 
-	private void Update () {
+	private void Update() {
 		if (hasEnded) return;
 
 		if (allowMovement) {
