@@ -38,6 +38,10 @@ public class GameController : MonoBehaviour {
 	private Transform xPlane;
 	[SerializeField]
 	private Transform zPlane;
+	[SerializeField]
+	private GameObject xPlaneGO;
+	[SerializeField]
+	private GameObject zPlaneGO;
 
 	[SerializeField]
 	private float axisPositionMin = -3.0f;
@@ -117,18 +121,18 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void makeBothHoles() {
-		makeHole(xPlane, Vector3.right);
-		makeHole(zPlane, Vector3.forward);
+		makeHole(xPlaneGO, Vector3.right);
+		makeHole(zPlaneGO, Vector3.forward);
 	}
 	
-	private void makeHole(Transform plane, Vector3 moveAxis) {
-		Vector3 originalPos = plane.position;
+	private void makeHole(GameObject plane, Vector3 moveAxis) {
+		Vector3 originalPos = plane.transform.position;
 		float axisPosition = axisPositionMax;
 
 		Mesh mesh = null;
 
 		while (axisPosition > axisPositionMin) {
-			plane.position = moveAxis * axisPosition;
+			plane.transform.position = moveAxis * axisPosition;
 			mesh = CSG.Subtract(plane.gameObject, activeForm.gameObject);
 
 			if (mesh != null) {
@@ -139,18 +143,26 @@ public class GameController : MonoBehaviour {
 				MeshFilter meshFilter = plane.GetComponent<MeshFilter>();
 
 				if (meshFilter != null) {
-					meshFilter.sharedMesh = mesh;
+					//meshFilter.sharedMesh = null;
+					DestroyImmediate(plane.GetComponent<MeshFilter>());
+					MeshFilter filter = plane.AddComponent<MeshFilter>();
+					//meshFilter.sharedMesh = mesh;
+					filter.sharedMesh = mesh;
 				}
 
 				MeshCollider planeCollider = plane.GetComponent<MeshCollider>();
 
 				if (planeCollider != null) {
-					planeCollider.sharedMesh = mesh;
+					//planeCollider.sharedMesh = null;
+					DestroyImmediate(plane.GetComponent<MeshCollider>());
+					MeshCollider collider = plane.AddComponent<MeshCollider>();
+					//planeCollider.sharedMesh = mesh;
+					collider.sharedMesh = mesh;
 				}
 			}
 
-			plane.position = originalPos;
-			plane.localScale = Vector3.one;
+			plane.transform.position = originalPos;
+			plane.transform.localScale = Vector3.one;
 
 			axisPosition -= axisStep;
 		}
