@@ -4,6 +4,14 @@
  public class AxisXYZ : MonoBehaviour
  {    
      static Material lineMaterial;
+	 
+	 GameObject pause;
+	 
+	 private void Start() {
+		//pause = gameObject;
+		//gameObject.SetActive(false);
+	}
+	 
      static void CreateLineMaterial()
      {
          if (!lineMaterial)
@@ -22,6 +30,47 @@
              lineMaterial.SetInt("_ZWrite", 0);
          }
      }
+	 
+	 private void Update() {
+		//appearReferenceLines();
+		/*if (Input.GetKey("z") ) {
+			Debug.Log("Si entra");
+			gameObject.SetActive(false);
+		}*/
+		
+	}
+	
+	private void appearReferenceLines() {
+		if (Input.GetKey("z") ) {
+			//if(!instLines) {
+				//instLines = Instantiate(lines,transform.position,Quaternion.identity);
+				
+			//}
+			gameObject.SetActive(false);
+			//transform.rotation = Quaternion.identity;
+			return;
+		}/*
+		else if (Input.GetKey("x") ) {
+			 Quaternion rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+			if(!instLines) {
+				instLines = Instantiate(lines,transform.position,rotation);
+			}
+			transform.rotation = rotation;
+			return;
+		}
+		else if (Input.GetKey("s") ) {
+			 Quaternion rotation = Quaternion.Euler(new Vector3(0, -90, 0));
+			if(!instLines) {
+				instLines = Instantiate(lines,transform.position,rotation);
+			}
+			transform.rotation = rotation;
+			return;
+		}*/
+		else {
+			//Destroy(instLines);
+			//gameObject.SetActive(false);
+		}
+	}
  
      // Will be called after all regular rendering is done
      public void OnRenderObject()

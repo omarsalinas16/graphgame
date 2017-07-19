@@ -51,9 +51,6 @@ public class LookAtCamera : MonoBehaviour {
 	
 	private float transformTargetScroll;
 	
-	[SerializeField]
-	private GameObject lines;
-	private GameObject instLines;
 	
 	[SerializeField]
 	private Transform target;
@@ -79,36 +76,13 @@ public class LookAtCamera : MonoBehaviour {
 		lookAngleY = startAngle.eulerAngles.y;
 
 		transformTargetScroll = mainCamera.orthographicSize;
+		rotatingFixed = false;
 	}
 
 	private void Update() {
 		
-		if (Input.GetKey("z") ) {
-			if(!instLines) {
-				instLines = Instantiate(lines,transform.position,Quaternion.identity);
-			}
-			transform.rotation = Quaternion.identity;
+		if(rotatingFixed)
 			return;
-		}
-		else if (Input.GetKey("x") ) {
-			 Quaternion rotation = Quaternion.Euler(new Vector3(90, 0, 0));
-			if(!instLines) {
-				instLines = Instantiate(lines,transform.position,rotation);
-			}
-			transform.rotation = rotation;
-			return;
-		}
-		else if (Input.GetKey("s") ) {
-			 Quaternion rotation = Quaternion.Euler(new Vector3(0, -90, 0));
-			if(!instLines) {
-				instLines = Instantiate(lines,transform.position,rotation);
-			}
-			transform.rotation = rotation;
-			return;
-		}
-		else if(instLines) {
-			Destroy(instLines);
-		}
 		
 		if (Time.timeScale < float.Epsilon)
 			return;
@@ -216,4 +190,15 @@ public class LookAtCamera : MonoBehaviour {
 		CancelInvoke("beginShake");
 		mainCamera.transform.localPosition = lastCameraLocalPosition;
 	}
+	
+	bool rotatingFixed;
+	public void fixedRotation(Quaternion q) {
+		transform.rotation = q;
+		rotatingFixed = true;
+	}
+	
+	public void setRotatingFixed(bool b) {
+		rotatingFixed = b;
+	}
+	
 }
