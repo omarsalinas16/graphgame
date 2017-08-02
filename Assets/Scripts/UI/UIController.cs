@@ -6,6 +6,12 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour {
 	public static UIController Instance { get; private set; }
 
+	[Header("Try Toggles")]
+	[SerializeField]
+	private Transform tryTogglesParent;
+	[SerializeField]
+	private GameObject tryTogglePreset;
+
 	[Header("Labels")]
 	[SerializeField]
 	private Text transformAttemptsLabel;
@@ -41,9 +47,51 @@ public class UIController : MonoBehaviour {
 		Instance = this;
 	}
 
+	public void setSolveTryAttempts(int amount) {
+		int i = 0;
+
+		if (tryTogglesParent.childCount < amount) {
+			foreach (Transform child in tryTogglesParent) {
+				DestroyImmediate(child.gameObject);
+			}
+
+			for (i = 0; i < amount; i++) {
+				Instantiate(tryTogglePreset, tryTogglesParent);
+			}
+		}
+
+		if (tryTogglesParent.childCount <= 0) {
+			return;
+		}
+
+		Toggle tryToggle;
+
+		for (i = 0; i < tryTogglesParent.childCount; i++) {
+			tryToggle = tryTogglesParent.GetChild(i).GetComponent<Toggle>();
+
+			if (amount > 0) {
+				if (tryToggle) {
+					tryToggle.isOn = true;
+				}
+
+				amount--;
+			} else {
+				if (tryToggle) {
+					tryToggle.isOn = false;
+				}
+			}
+		}
+	}
+
 	public void setTransformAttempsLabel(int amount) {
 		if (transformAttemptsLabel) {
 			transformAttemptsLabel.text = (amount >= 0 ? amount : 0).ToString();
+		}
+	}
+
+	public void runSolveTry() {
+		if (GameController.Instance && GameController.Instance.solveTryAttempts > 0) {
+			GameController.Instance.solveTryAttempts--;
 		}
 	}
 

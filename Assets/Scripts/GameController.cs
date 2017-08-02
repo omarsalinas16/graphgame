@@ -14,6 +14,24 @@ public class GameController : MonoBehaviour {
 
 	[Header("Points")]
 	[SerializeField]
+	private int maxSolveTryAttempts = 3;
+	private int _solveTryAttempts;
+
+	public int solveTryAttempts {
+		get {
+			return _solveTryAttempts;
+		}
+
+		set {
+			_solveTryAttempts = value < 0 ? 0 : value;
+
+			if (UIController.Instance) {
+				UIController.Instance.setSolveTryAttempts(_solveTryAttempts);
+			}
+		}
+	}
+
+	[SerializeField]
 	private int maxTransformAttempts = 5;
 	private int _transformAttempts;
 
@@ -23,7 +41,7 @@ public class GameController : MonoBehaviour {
 		}
 
 		set {
-			_transformAttempts = value;
+			_transformAttempts = value < 0 ? 0 : value;
 
 			if (UIController.Instance) {
 				UIController.Instance.setTransformAttempsLabel(_transformAttempts);
@@ -148,6 +166,10 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	public void initSolveTryAttempts() {
+		solveTryAttempts = maxSolveTryAttempts;
+	}
+
 	public void initTransformAttempts() {
 		transformAttempts = maxTransformAttempts;
 	}
@@ -170,6 +192,7 @@ public class GameController : MonoBehaviour {
 				PlayerController.Instance.setActiveForm(getActiveForm());
 			}
 
+			initSolveTryAttempts();
 			initTransformAttempts();
 		}
 	}
