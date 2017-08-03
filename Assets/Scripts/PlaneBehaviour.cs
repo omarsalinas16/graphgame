@@ -2,19 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlaneStatus {
+	Idle = 0,
+	Move = 1,
+	Return = 2,
+	Ended = 3,
+	Collided = 4
+}
+
 public class PlaneBehaviour : MonoBehaviour {
 	[SerializeField]
 	private string formTag = "Form";
 
 	[SerializeField]
-	private bool _allowMovement = false;
-	public bool allowMovement {
+	private PlaneStatus _planeStatus = PlaneStatus.Idle;
+	public PlaneStatus planeStatus {
 		get {
-			return _allowMovement;
+			return _planeStatus;
 		}
 
 		set {
-			_allowMovement = value;
+			_planeStatus = value;
 		}
 	}
 
@@ -32,51 +40,28 @@ public class PlaneBehaviour : MonoBehaviour {
 	private float currentLerpTime = 0.0f;
 
 	private Vector3 startPosition;
+	private Vector3 endPosition;
 	private Vector3 targetPosition;
-
-	private bool hasStartedReturning = false;
-
-	private bool _hasEnded = false;
-	public bool hasEnded {
-		get {
-			return _hasEnded;
-		}
-
-		set {
-			_hasEnded = value;
-		}
-	}
-
-	private bool _hasCollided = false;
-	public bool hasCollided {
-		get {
-			return _hasCollided;
-		}
-
-		set {
-			_hasCollided = value;
-		}
-	}
 
 	private void Start() {
 		startPosition = transform.position;
-		targetPosition = startPosition + direction * (distanceToMove - planeWidth);
+		endPosition = startPosition + direction * (distanceToMove - planeWidth);
+
+		targetPosition = endPosition;
 	}
 
 	private void Update() {
-		if (hasEnded) return;
-
-		if (allowMovement) {
+		if (planeStatus > PlaneStatus.Idle && planeStatus < PlaneStatus.Ended) {
 			if (currentLerpTime >= lerpDuration) {
 				transform.position = targetPosition;
 
-				if (!hasStartedReturning) {
+				if (planeStatus < PlaneStatus.Return) {
 					targetPosition = startPosition;
 					currentLerpTime = 0.0f;
-					hasStartedReturning = true;
+
+					planeStatus = PlaneStatus.Return;
 				} else {
-					allowMovement = false;
-					hasEnded = true;
+					planeStatus = PlaneStatus.Ended;
 				}
 			} else {
 				float percentaje = currentLerpTime / lerpDuration;
@@ -87,10 +72,16 @@ public class PlaneBehaviour : MonoBehaviour {
 		}
 	}
 
+	public void resetFlags() {
+		planeStatus = PlaneStatus.Idle;
+
+		targetPosition = endPosition;
+		currentLerpTime = 0.0f;
+	}
+
 	private void OnTriggerEnter(Collider other) {
 		if (other.CompareTag(formTag)) {
-			hasCollided = true;
-			hasEnded = true;
+			planeStatus = PlaneStatus.Collided;
 
 			if (LookAtCamera.Instance) {
 				LookAtCamera.Instance.shakeCamera(0.2f, 0.25f);

@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Parabox.CSG;
 
+public enum PlaneSequenceStatus {
+	Idle = 0,
+	Started = 1,
+	MovingX = 2,
+	MovingZ = 3,
+	Ended = 4,
+	Collided = 5
+}
+
 [RequireComponent(typeof(PlayerController))]
 [RequireComponent(typeof(FormBehaviour))]
 public class GameController : MonoBehaviour {
@@ -65,7 +74,16 @@ public class GameController : MonoBehaviour {
 	private PlaneBehaviour xPlaneBehaviour;
 	private PlaneBehaviour zPlaneBehaviour;
 
-	private bool movePlanes = false;
+	private PlaneSequenceStatus _planeSequenceStatus = PlaneSequenceStatus.Idle;
+	public PlaneSequenceStatus planeSequenceStatus {
+		get {
+			return _planeSequenceStatus;
+		}
+
+		set {
+			_planeSequenceStatus = value;
+		}
+	}
 
 	[Header("Shapes")]
 	[SerializeField]
@@ -98,25 +116,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.DownArrow)) {
-			movePlanes = true;
-		}
-
-		if (movePlanes) {
-			if (!xPlaneBehaviour.allowMovement) {
-				xPlaneBehaviour.allowMovement = true;
-			}
-
-			if (xPlaneBehaviour.hasEnded && !xPlaneBehaviour.hasCollided) {
-				if (!zPlaneBehaviour.allowMovement) {
-					zPlaneBehaviour.allowMovement = true;
-				}
-			}
-
-			if (zPlaneBehaviour.hasEnded) {
-				movePlanes = false;
-			}
-		}
+		handlePlaneSequence();
 	}
 
 	private void makeBothHoles() {
@@ -166,7 +166,65 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
-	public void initSolveTryAttempts() {
+	public void startPlaneSequence() {
+		if (planeSequenceStatus == PlaneSequenceStatus.Idle && solveTryAttempts > 0) {
+			planeSequenceStatus = PlaneSequenceStatus.Started;
+		}
+	}
+
+	private void handlePlaneSequence() {
+		if (planeSequenceStatus > PlaneSequenceStatus.Idle && planeSequenceStatus < PlaneSequenceStatus.Ended) {
+			if (planeSequenceStatus == PlaneSequenceStatus.Started) {
+				planeSequenceStatus = PlaneSequenceStatus.MovingX;
+			}
+
+			if (planeSequenceStatus == PlaneSequenceStatus.MovingX) {
+				if (xPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
+					xPlaneBehaviour.planeStatus = PlaneStatus.Move;
+				}
+
+				if (xPlaneBehaviour.planeStatus >= PlaneStatus.Ended) {
+					if (xPlaneBehaviour.planeStatus == PlaneStatus.Collided) {
+						planeSequenceStatus = PlaneSequenceStatus.Collided;
+						Debug.Log("Collided with X");
+					} else {
+						planeSequenceStatus = PlaneSequenceStatus.MovingZ;
+					}
+				}
+			}
+
+			if (planeSequenceStatus == PlaneSequenceStatus.MovingZ) {
+				if (zPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
+					zPlaneBehaviour.planeStatus = PlaneStatus.Move;
+				}
+
+				if (zPlaneBehaviour.planeStatus >= PlaneStatus.Ended) {
+					if (zPlaneBehaviour.planeStatus == PlaneStatus.Collided) {
+						planeSequenceStatus = PlaneSequenceStatus.Collided;
+						Debug.Log("Collided with Z");
+					} else {
+						planeSequenceStatus = PlaneSequenceStatus.Ended;
+					}
+				}
+			}
+		} else {
+			if (planeSequenceStatus > PlaneSequenceStatus.Idle) {
+				if (planeSequenceStatus == PlaneSequenceStatus.Collided) {
+					solveTryAttempts--;
+					Debug.Log("Wrong");
+				} else if (planeSequenceStatus == PlaneSequenceStatus.Ended) {
+					Debug.Log("Win!");
+				}
+
+				xPlaneBehaviour.resetFlags();
+				zPlaneBehaviour.resetFlags();
+
+				planeSequenceStatus = PlaneSequenceStatus.Idle;
+			}
+		}
+	}
+
+	private void initSolveTryAttempts() {
 		solveTryAttempts = maxSolveTryAttempts;
 	}
 

@@ -90,8 +90,8 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void runSolveTry() {
-		if (GameController.Instance && GameController.Instance.solveTryAttempts > 0) {
-			GameController.Instance.solveTryAttempts--;
+		if (GameController.Instance) {
+			GameController.Instance.startPlaneSequence();
 		}
 	}
 
