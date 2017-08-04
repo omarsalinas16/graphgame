@@ -6,25 +6,14 @@ public enum PlaneStatus {
 	Idle = 0,
 	Move = 1,
 	Return = 2,
-	Ended = 3,
-	Collided = 4
+	Ended = 3
 }
 
 public class PlaneBehaviour : MonoBehaviour {
 	[SerializeField]
 	private string formTag = "Form";
 
-	[SerializeField]
-	private PlaneStatus _planeStatus = PlaneStatus.Idle;
-	public PlaneStatus planeStatus {
-		get {
-			return _planeStatus;
-		}
-
-		set {
-			_planeStatus = value;
-		}
-	}
+	public PlaneStatus planeStatus = PlaneStatus.Idle;
 
 	[Header("Plane Details")]
 	[SerializeField]
@@ -51,6 +40,13 @@ public class PlaneBehaviour : MonoBehaviour {
 	}
 
 	private void Update() {
+		if (planeStatus == PlaneStatus.Ended) {
+			planeStatus = PlaneStatus.Idle;
+
+			targetPosition = endPosition;
+			currentLerpTime = 0.0f;
+		}
+
 		if (planeStatus > PlaneStatus.Idle && planeStatus < PlaneStatus.Ended) {
 			if (currentLerpTime >= lerpDuration) {
 				transform.position = targetPosition;
@@ -72,22 +68,20 @@ public class PlaneBehaviour : MonoBehaviour {
 		}
 	}
 
-	public void resetFlags() {
-		planeStatus = PlaneStatus.Idle;
-
-		targetPosition = endPosition;
-		currentLerpTime = 0.0f;
-	}
-
 	private void OnTriggerEnter(Collider other) {
-		if (other.CompareTag(formTag)) {
-			planeStatus = PlaneStatus.Collided;
+		if (planeStatus == PlaneStatus.Move) {
+			if (other.CompareTag(formTag)) {
+				targetPosition = startPosition;
+				planeStatus = PlaneStatus.Return;
 
-			if (LookAtCamera.Instance) {
-				LookAtCamera.Instance.shakeCamera(0.2f, 0.25f);
+				if (GameController.Instance) {
+					GameController.Instance.planeSequenceStatus = PlaneSequenceStatus.Collided;
+				}
+
+				if (LookAtCamera.Instance) {
+					LookAtCamera.Instance.shakeCamera(0.2f, 0.25f);
+				}
 			}
-
-			Debug.Log("Collide!");
 		}
 	}
 }

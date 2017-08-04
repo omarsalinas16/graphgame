@@ -5,11 +5,10 @@ using Parabox.CSG;
 
 public enum PlaneSequenceStatus {
 	Idle = 0,
-	Started = 1,
-	MovingX = 2,
-	MovingZ = 3,
-	Ended = 4,
-	Collided = 5
+	MovingX = 1,
+	MovingZ = 2,
+	Ended = 3,
+	Collided = 4
 }
 
 [RequireComponent(typeof(PlayerController))]
@@ -74,16 +73,7 @@ public class GameController : MonoBehaviour {
 	private PlaneBehaviour xPlaneBehaviour;
 	private PlaneBehaviour zPlaneBehaviour;
 
-	private PlaneSequenceStatus _planeSequenceStatus = PlaneSequenceStatus.Idle;
-	public PlaneSequenceStatus planeSequenceStatus {
-		get {
-			return _planeSequenceStatus;
-		}
-
-		set {
-			_planeSequenceStatus = value;
-		}
-	}
+	public PlaneSequenceStatus planeSequenceStatus = PlaneSequenceStatus.Idle;
 
 	[Header("Shapes")]
 	[SerializeField]
@@ -168,28 +158,30 @@ public class GameController : MonoBehaviour {
 
 	public void startPlaneSequence() {
 		if (planeSequenceStatus == PlaneSequenceStatus.Idle && solveTryAttempts > 0) {
-			planeSequenceStatus = PlaneSequenceStatus.Started;
+			planeSequenceStatus = PlaneSequenceStatus.MovingX;
 		}
 	}
 
 	private void handlePlaneSequence() {
-		if (planeSequenceStatus > PlaneSequenceStatus.Idle && planeSequenceStatus < PlaneSequenceStatus.Ended) {
-			if (planeSequenceStatus == PlaneSequenceStatus.Started) {
-				planeSequenceStatus = PlaneSequenceStatus.MovingX;
+		if (planeSequenceStatus >= PlaneSequenceStatus.Ended) {
+			if (planeSequenceStatus == PlaneSequenceStatus.Ended) {
+				Debug.Log("Win!");
+			} else {
+				solveTryAttempts--;
+				Debug.Log("Lose!");
 			}
+			
+			planeSequenceStatus = PlaneSequenceStatus.Idle;
+		}
 
+		if (planeSequenceStatus > PlaneSequenceStatus.Idle && planeSequenceStatus < PlaneSequenceStatus.Ended) {
 			if (planeSequenceStatus == PlaneSequenceStatus.MovingX) {
 				if (xPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
 					xPlaneBehaviour.planeStatus = PlaneStatus.Move;
 				}
 
-				if (xPlaneBehaviour.planeStatus >= PlaneStatus.Ended) {
-					if (xPlaneBehaviour.planeStatus == PlaneStatus.Collided) {
-						planeSequenceStatus = PlaneSequenceStatus.Collided;
-						Debug.Log("Collided with X");
-					} else {
-						planeSequenceStatus = PlaneSequenceStatus.MovingZ;
-					}
+				if (xPlaneBehaviour.planeStatus == PlaneStatus.Ended) {
+					planeSequenceStatus = PlaneSequenceStatus.MovingZ;
 				}
 			}
 
@@ -198,28 +190,9 @@ public class GameController : MonoBehaviour {
 					zPlaneBehaviour.planeStatus = PlaneStatus.Move;
 				}
 
-				if (zPlaneBehaviour.planeStatus >= PlaneStatus.Ended) {
-					if (zPlaneBehaviour.planeStatus == PlaneStatus.Collided) {
-						planeSequenceStatus = PlaneSequenceStatus.Collided;
-						Debug.Log("Collided with Z");
-					} else {
-						planeSequenceStatus = PlaneSequenceStatus.Ended;
-					}
+				if (zPlaneBehaviour.planeStatus == PlaneStatus.Ended) {
+					planeSequenceStatus = PlaneSequenceStatus.Ended;
 				}
-			}
-		} else {
-			if (planeSequenceStatus > PlaneSequenceStatus.Idle) {
-				if (planeSequenceStatus == PlaneSequenceStatus.Collided) {
-					solveTryAttempts--;
-					Debug.Log("Wrong");
-				} else if (planeSequenceStatus == PlaneSequenceStatus.Ended) {
-					Debug.Log("Win!");
-				}
-
-				xPlaneBehaviour.resetFlags();
-				zPlaneBehaviour.resetFlags();
-
-				planeSequenceStatus = PlaneSequenceStatus.Idle;
 			}
 		}
 	}

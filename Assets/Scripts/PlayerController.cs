@@ -5,16 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 	public static PlayerController Instance { get; private set; }
 
-	private Transform _activeForm = null;
-	public Transform activeForm {
-		get {
-			return _activeForm;
-		}
-
-		set {
-			_activeForm = value;
-		}
-	}
+	public Transform activeForm = null;
 
 	[Header("Settings")]
 	[SerializeField]
