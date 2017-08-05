@@ -5,6 +5,9 @@ using UnityEngine;
 public class GridBehaviour : MonoBehaviour {
 	[SerializeField]
 	private GameObject lines;
+	private Quaternion lastCameraRotation;
+
+	private bool needsToRevert = false;
 
 	private void Start() {
 		if (!lines) {
@@ -15,24 +18,43 @@ public class GridBehaviour : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (Input.GetKey("z")) {
-			rotate(new Vector3(0, 0, 0));
-		} else if (Input.GetKey("x")) {
-			rotate(new Vector3(90, 0, 0));
-		} else if (Input.GetKey("s")) {
-			rotate(new Vector3(0, -90, 0));
-		} else {
+		if (Input.GetKeyDown("x")) {
+			setGridAndCameraRotation(90, 0, 0);
+		}
+
+		if (Input.GetKeyDown("y")) {
+			setGridAndCameraRotation(0, -90, 0);
+		}
+
+		if (Input.GetKeyDown("z")) {
+			setGridAndCameraRotation(0, 0, 0);
+		}
+
+		if (Input.GetKeyUp("x") || Input.GetKeyUp("y") || Input.GetKeyUp("z")) {
 			lines.SetActive(false);
-			LookAtCamera.Instance.setRotatingFixed(false);
+
+			if (needsToRevert && LookAtCamera.Instance) {
+				LookAtCamera.Instance.setTargetRotation(lastCameraRotation);
+				LookAtCamera.Instance.allowInput = true;
+
+				needsToRevert = false;
+			}
 		}
 	}
 
-	private void rotate(Vector3 v) {
-		Quaternion rotation = Quaternion.Euler(v);
+	private void setGridAndCameraRotation(float x, float y, float z) {
+		Quaternion rotation = Quaternion.Euler(x, y, z);
 
-		lines.SetActive(true);
 		lines.transform.rotation = rotation;
 
-		LookAtCamera.Instance.fixedRotation(rotation);
+		if (LookAtCamera.Instance) {
+			lastCameraRotation = LookAtCamera.Instance.getTargetRotation();
+			LookAtCamera.Instance.setTargetRotation(rotation);
+
+			LookAtCamera.Instance.allowInput = false;
+		}
+
+		lines.SetActive(true);
+		needsToRevert = true;
 	}
 }

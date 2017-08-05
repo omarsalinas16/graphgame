@@ -23,8 +23,8 @@ public class GameController : MonoBehaviour {
 	[Header("Points")]
 	[SerializeField]
 	private int maxSolveTryAttempts = 3;
+	[SerializeField]
 	private int _solveTryAttempts;
-
 	public int solveTryAttempts {
 		get {
 			return _solveTryAttempts;
@@ -41,8 +41,8 @@ public class GameController : MonoBehaviour {
 
 	[SerializeField]
 	private int maxTransformAttempts = 5;
+	[SerializeField]
 	private int _transformAttempts;
-
 	public int transformAttempts {
 		get {
 			return _transformAttempts;
@@ -157,7 +157,10 @@ public class GameController : MonoBehaviour {
 	}
 
 	public void startPlaneSequence() {
-		if (planeSequenceStatus == PlaneSequenceStatus.Idle && solveTryAttempts > 0) {
+		if (solveTryAttempts > 0 && 
+			planeSequenceStatus == PlaneSequenceStatus.Idle &&
+			xPlaneBehaviour.planeStatus == PlaneStatus.Idle &&
+			zPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
 			planeSequenceStatus = PlaneSequenceStatus.MovingX;
 		}
 	}

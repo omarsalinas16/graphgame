@@ -9,10 +9,8 @@ public class LookAtCamera : MonoBehaviour {
 	[SerializeField]
 	private Camera mainCamera;
 	private Quaternion startAngle;
-
-	[SerializeField]
-	private bool allowInput = true;
-	private bool rotatingFixed = false;
+	
+	public bool allowInput = true;
 
 	[Header("Turning")]
 	[SerializeField]
@@ -42,14 +40,10 @@ public class LookAtCamera : MonoBehaviour {
 	private float shakeAmount = 2.0f;
 	private Vector3 lastCameraLocalPosition;
 
-	[Header("Cursor")]
-	[SerializeField]
-	private bool lockCursor = false;
+	private float lookAngleX = 0.0f;
+	private float lookAngleY = 0.0f;
 
-	private float lookAngleX;
-	private float lookAngleY;
-	private Quaternion transformTargetRot;
-
+	private Quaternion targetRotation;
 	private float transformTargetScroll;
 
 	private void Awake() {
@@ -57,22 +51,17 @@ public class LookAtCamera : MonoBehaviour {
 			Destroy(gameObject);
 
 		Instance = this;
+	}
 
-		Cursor.lockState = CursorLockMode.Confined;
-		Cursor.visible = !lockCursor;
-
-		transformTargetRot = transform.localRotation;
-
+	private void Start() {
 		if (mainCamera == null) {
 			mainCamera = Camera.main;
 		}
 
-		startAngle = transform.rotation;
-
-		lookAngleX = startAngle.eulerAngles.x;
-		lookAngleY = startAngle.eulerAngles.y;
-
 		transformTargetScroll = mainCamera.orthographicSize;
+
+		startAngle = transform.rotation;
+		setTargetRotation(startAngle);
 	}
 
 	private void Update() {
@@ -80,69 +69,66 @@ public class LookAtCamera : MonoBehaviour {
 			return;
 		}
 
-		if (rotatingFixed) {
-			return;
-		}
-
-		if (Input.GetButton("Fire1") && allowInput) {
-			if (lockCursor) {
-				Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
-				Cursor.visible = !lockCursor;
-			}
-
-			handleRotationMovement();
-		} else {
-			if (lockCursor) {
-				Cursor.lockState = lockCursor ? CursorLockMode.Confined : CursorLockMode.None;
-				Cursor.visible = lockCursor;
-			}
-
-			if (turnSmoothing > 0 && transform.localRotation != transformTargetRot)
-				transform.localRotation = Quaternion.Slerp(transform.localRotation, transformTargetRot, turnSmoothing * Time.deltaTime);
-		}
-
 		if (allowInput) {
+			if (Input.GetButton("Fire1")) {
+				handleRotationInput();
+			}
+
 			handleScrollZoom();
 		}
+
+		handleRotationMovement();
 	}
 
-	private void OnDisable() {
-		Cursor.lockState = CursorLockMode.None;
-		Cursor.visible = true;
-		allowInput = false;
-	}
-
-	private void handleRotationMovement() {
-		if (Time.timeScale < float.Epsilon)
-			return;
-
+	private void handleRotationInput() {
 		float xInput = Input.GetAxis("Mouse Y") * (invertYAxis ? -1 : 1);
 		float yInput = Input.GetAxis("Mouse X") * (invertXAxis ? 1 : -1);
-
+		
 		lookAngleX += xInput * turnSpeed;
 
 		if (lookAngleX > 360 || lookAngleX < -360) {
 			lookAngleX = 0;
 		}
-
+		
 		lookAngleY += yInput * turnSpeed;
 
 		if (lookAngleY > 360 || lookAngleY < -360) {
 			lookAngleY = 0;
 		}
 
-		transformTargetRot = Quaternion.Euler(lookAngleX, lookAngleY, 0f);
+		setTargetRotation(lookAngleX, lookAngleY, 0f);
+	}
 
+	private void handleRotationMovement() {
 		if (turnSmoothing > 0) {
-			transform.localRotation = Quaternion.Slerp(transform.localRotation, transformTargetRot, turnSmoothing * Time.deltaTime);
+			transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSmoothing * Time.deltaTime);
 		} else {
-			transform.localRotation = transformTargetRot;
+			transform.rotation = targetRotation;
 		}
 	}
 
+	public Quaternion getTargetRotation() {
+		return targetRotation;
+	}
+
+	public void setTargetRotation(Quaternion angle) {
+		lookAngleX = angle.eulerAngles.x;
+		lookAngleY = angle.eulerAngles.y;
+
+		targetRotation = angle;
+	}
+
+	public void setTargetRotation(float x, float y, float z) {
+		lookAngleX = x;
+		lookAngleY = y;
+
+		targetRotation = Quaternion.Euler(x, y, z);
+	}
+
 	private void handleScrollZoom() {
-		if (Time.timeScale < float.Epsilon || mainCamera == null)
+		if (mainCamera == null) {
 			return;
+		}
 
 		if (Input.GetAxis("Mouse ScrollWheel") != 0) {
 			transformTargetScroll -= Input.GetAxis("Mouse ScrollWheel") * 1000 * scrollSpeed * Time.deltaTime;
@@ -150,18 +136,16 @@ public class LookAtCamera : MonoBehaviour {
 		}
 
 		if (mainCamera.orthographicSize != transformTargetScroll) {
-			if (scrollSmoothing > 0)
+			if (scrollSmoothing > 0) {
 				mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, transformTargetScroll, scrollSmoothing * Time.deltaTime);
-			else
+			} else {
 				mainCamera.orthographicSize = transformTargetScroll;
+			}
 		}
 	}
 
 	public void resetCameraPosition() {
-		lookAngleX = startAngle.eulerAngles.x;
-		lookAngleY = startAngle.eulerAngles.y;
-
-		transformTargetRot = Quaternion.Euler(lookAngleX, lookAngleY, 0f);
+		setTargetRotation(startAngle);
 	}
 
 	public void shakeCamera(float amount, float duration) {
@@ -176,8 +160,8 @@ public class LookAtCamera : MonoBehaviour {
 		if (shakeAmount > 0.0f) {
 			Vector3 cameraShakePosition = mainCamera.transform.position;
 
-			cameraShakePosition.x += Random.value * shakeAmount * 2 - shakeAmount;
-			cameraShakePosition.z += Random.value * shakeAmount * 2 - shakeAmount;
+			cameraShakePosition.x += Random.value * shakeAmount * 2.0f - shakeAmount;
+			cameraShakePosition.z += Random.value * shakeAmount * 2.0f - shakeAmount;
 
 			mainCamera.transform.position = cameraShakePosition;
 		}
@@ -186,14 +170,5 @@ public class LookAtCamera : MonoBehaviour {
 	private void stopShake() {
 		CancelInvoke("beginShake");
 		mainCamera.transform.localPosition = lastCameraLocalPosition;
-	}
-
-	public void fixedRotation(Quaternion q) {
-		transform.localRotation = q;
-		rotatingFixed = true;
-	}
-
-	public void setRotatingFixed(bool b) {
-		rotatingFixed = b;
 	}
 }
