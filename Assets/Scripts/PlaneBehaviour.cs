@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public enum PlaneStatus {
 	Idle = 0,
@@ -26,7 +24,17 @@ public class PlaneBehaviour : MonoBehaviour {
 	private Vector3 direction = Vector3.right;
 	[SerializeField]
 	private float lerpDuration;
-	private float currentLerpTime = 0.0f;
+	[SerializeField]
+	private float _currentLerpTime = 0.0f;
+	private float currentLerpTime {
+		get {
+			return _currentLerpTime;
+		}
+
+		set {
+			_currentLerpTime = Mathf.Clamp(value, 0.0f, lerpDuration);
+		}
+	}
 
 	private Vector3 startPosition;
 	private Vector3 endPosition;
@@ -42,45 +50,39 @@ public class PlaneBehaviour : MonoBehaviour {
 	private void Update() {
 		if (planeStatus == PlaneStatus.Ended) {
 			planeStatus = PlaneStatus.Idle;
-
-			targetPosition = endPosition;
-			currentLerpTime = 0.0f;
-		}
-
-		if (planeStatus > PlaneStatus.Idle && planeStatus < PlaneStatus.Ended) {
+		} else if (planeStatus > PlaneStatus.Idle) {
 			if (currentLerpTime >= lerpDuration) {
 				transform.position = targetPosition;
 
 				if (planeStatus < PlaneStatus.Return) {
-					targetPosition = startPosition;
-					currentLerpTime = 0.0f;
-
 					planeStatus = PlaneStatus.Return;
+					targetPosition = startPosition;
 				} else {
 					planeStatus = PlaneStatus.Ended;
+					targetPosition = endPosition;
 				}
-			} else {
-				float percentaje = currentLerpTime / lerpDuration;
 
-				transform.position = Vector3.Lerp(transform.position, targetPosition, percentaje);
+				currentLerpTime = 0.0f;
+			} else {
 				currentLerpTime += Time.deltaTime;
+				float percentage = Mathf.Clamp01(currentLerpTime / lerpDuration);
+
+				transform.position = Vector3.Lerp(transform.position, targetPosition, percentage);
 			}
 		}
 	}
 
 	private void OnTriggerEnter(Collider other) {
-		if (planeStatus == PlaneStatus.Move) {
-			if (other.CompareTag(formTag)) {
-				targetPosition = startPosition;
-				planeStatus = PlaneStatus.Return;
+		if (planeStatus == PlaneStatus.Move && other.CompareTag(formTag)) {
+			planeStatus = PlaneStatus.Return;
+			targetPosition = startPosition;
 
-				if (GameController.Instance) {
-					GameController.Instance.planeSequenceStatus = PlaneSequenceStatus.Collided;
-				}
+			if (GameController.Instance) {
+				GameController.Instance.planeSequenceStatus = PlaneSequenceStatus.Collided;
+			}
 
-				if (LookAtCamera.Instance) {
-					LookAtCamera.Instance.shakeCamera(0.2f, 0.25f);
-				}
+			if (LookAtCamera.Instance) {
+				LookAtCamera.Instance.shakeCamera(0.2f, 0.25f);
 			}
 		}
 	}

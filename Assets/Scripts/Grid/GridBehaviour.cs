@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GridBehaviour : MonoBehaviour {
 	[SerializeField]
@@ -20,13 +18,9 @@ public class GridBehaviour : MonoBehaviour {
 	private void Update() {
 		if (Input.GetKeyDown("x")) {
 			setGridAndCameraRotation(90, 0, 0);
-		}
-
-		if (Input.GetKeyDown("y")) {
+		} else if (Input.GetKeyDown("y")) {
 			setGridAndCameraRotation(0, -90, 0);
-		}
-
-		if (Input.GetKeyDown("z")) {
+		} else if (Input.GetKeyDown("z")) {
 			setGridAndCameraRotation(0, 0, 0);
 		}
 

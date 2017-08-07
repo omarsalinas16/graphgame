@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 	public static PlayerController Instance { get; private set; }
@@ -9,45 +7,102 @@ public class PlayerController : MonoBehaviour {
 
 	[Header("Settings")]
 	[SerializeField]
-	private float differenceThreshold = 0.001f;
+	private float interpolationDuration = 2.0f;
+	[SerializeField]
+	private AnimationCurve easeCurve;
 
 	[Header("Translation")]
 	[SerializeField]
 	private bool smoothTranslate = false;
-	[SerializeField]
-	[Range(0.01f, 10.0f)]
-	private float translateSmoothAmount = 1.0f;
 	[SerializeField]
 	private Vector3 translateLimitsMin;
 	[SerializeField]
 	private Vector3 translateLimitsMax;
 
 	private Vector3 targetTranslate;
-	private bool hasBeenTranslated = false;
+	private Vector3 lastTargetTranslate;
+	private bool needsToTranslate = false;
+
+	private float _translateInterpolation = 0.0f;
+	private float translateInterpolation {
+		get {
+			return _translateInterpolation;
+		}
+
+		set {
+			_translateInterpolation = Mathf.Clamp(value, 0.0f, interpolationDuration);
+		}
+	}
 
 	[Header("Rotation")]
 	[SerializeField]
 	private bool smoothRotation = false;
-	[SerializeField]
-	[Range(0.01f, 10.0f)]
-	private float rotationSmoothAmount = 1.0f;
 
-	private float rotationAngleX = 0.0f;
-	private float rotationAngleY = 0.0f;
+	private float _rotationAngleX = 0.0f;
+	private float rotationAngleX {
+		get {
+			return _rotationAngleX;
+		}
+
+		set {
+			_rotationAngleX = value;
+
+			if (_rotationAngleX < -360.0f || _rotationAngleX > 360.0f) {
+				_rotationAngleX = 0.0f;
+			}
+		}
+	}
+
+	private float _rotationAngleY = 0.0f;
+	private float rotationAngleY {
+		get {
+			return _rotationAngleY;
+		}
+
+		set {
+			_rotationAngleY = value;
+
+			if (_rotationAngleY < -360.0f || _rotationAngleY > 360.0f) {
+				_rotationAngleY = 0.0f;
+			}
+		}
+	}
+
 	private Quaternion targetRotation;
-	private bool hasBeenRotated = false;
+	private Quaternion lastTargetRotation;
+	private bool needsToRotate = false;
+
+	private float _rotationInterpolation = 0.0f;
+	private float rotationInterpolation {
+		get {
+			return _rotationInterpolation;
+		}
+
+		set {
+			_rotationInterpolation = Mathf.Clamp(value, 0.0f, interpolationDuration);
+		}
+	}
 
 	[Header("Scale")]
 	[SerializeField]
 	private bool smoothScale = false;
 	[SerializeField]
-	[Range(0.01f, 10.0f)]
-	private float scaleSmoothAmount = 1.0f;
-	[SerializeField]
 	private Vector2 scaleLimits;
 
 	private Vector3 targetScale;
-	private bool hasBeenScaled = false;
+	private Vector3 lastTargetScale;
+	private bool needsToScale = false;
+
+	private float _scaleInterpolation = 0.0f;
+	private float scaleInterpolation {
+		get {
+			return _scaleInterpolation;
+		}
+
+		set {
+			_scaleInterpolation = Mathf.Clamp(value, 0.0f, interpolationDuration);
+		}
+	}
 
 	private void Awake() {
 		if (Instance != null && Instance != this)
@@ -65,109 +120,142 @@ public class PlayerController : MonoBehaviour {
 	public void setActiveForm(Transform form) {
 		activeForm = form;
 
-		hasBeenTranslated = false;
-		hasBeenRotated = false;
-		hasBeenScaled = false;
-
 		initTargetTransforms();
+
+		needsToTranslate = false;
+		needsToRotate = false;
+		needsToScale = false;
 	}
 
 	public void initTargetTransforms() {
-		targetTranslate = Vector3.zero;
-
-		targetRotation = Quaternion.identity;
-		rotationAngleX = 0.0f;
-		rotationAngleY = 0.0f;
-
-		targetScale = new Vector3(1.0f, 1.0f, 1.0f);
+		setTargetTranslate(0.0f, 0.0f, 0.0f);
+		setTargetRotation(0.0f, 0.0f);
+		setTargetScale(1.0f, 1.0f, 1.0f);
 	}
 
-	public void setTargetTranslate(float x, float y, float z) {
-		targetTranslate.x += x;
-		targetTranslate.y += y;
-		targetTranslate.z += z;
+	private void setTargetTranslate(float x, float y, float z) {
+		lastTargetTranslate = targetTranslate;
 
-		targetTranslate.x = Mathf.Clamp(targetTranslate.x, translateLimitsMin.x, translateLimitsMax.x);
-		targetTranslate.y = Mathf.Clamp(targetTranslate.y, translateLimitsMin.y, translateLimitsMax.y);
-		targetTranslate.z = Mathf.Clamp(targetTranslate.z, translateLimitsMin.z, translateLimitsMax.z);
+		targetTranslate.x = Mathf.Clamp(x, translateLimitsMin.x, translateLimitsMax.x);
+		targetTranslate.y = Mathf.Clamp(y, translateLimitsMin.y, translateLimitsMax.y);
+		targetTranslate.z = Mathf.Clamp(z, translateLimitsMin.z, translateLimitsMax.z);
 
-		hasBeenTranslated = true;
+		needsToTranslate = true;
+	}
+
+	public void addTargetTranslate(float x, float y, float z) {
+		x += targetTranslate.x;
+		y += targetTranslate.y;
+		z += targetTranslate.z;
+
+		setTargetTranslate(x, y, z);
 	}
 
 	private void doTranslate() {
-		if (Time.timeScale < float.Epsilon || !hasBeenTranslated || !activeForm) {
+		if (Time.timeScale < float.Epsilon || !needsToTranslate || !activeForm) {
 			return;
 		}
 
-		if (smoothTranslate && translateSmoothAmount > 0.0f) {
-			activeForm.localPosition = Vector3.Lerp(activeForm.localPosition, targetTranslate, translateSmoothAmount * Time.deltaTime);
+		if (activeForm.localPosition == targetTranslate) {
+			translateInterpolation = 0.0f;
+			return;
+		}
 
-			float difference = targetTranslate.magnitude - activeForm.localPosition.magnitude;
+		if (smoothTranslate && interpolationDuration > 0.0f) {
+			if (translateInterpolation <= interpolationDuration) {
+				translateInterpolation += Time.deltaTime;
 
-			if (Mathf.Abs(difference) <= differenceThreshold) {
+				float percentage = Mathf.Clamp01(translateInterpolation / interpolationDuration);
+				activeForm.localPosition = Vector3.Lerp(lastTargetTranslate, targetTranslate, easeCurve.Evaluate(percentage));
+			} else {
 				activeForm.localPosition = targetTranslate;
+				translateInterpolation = 0.0f;
 			}
 		} else {
 			activeForm.localPosition = targetTranslate;
 		}
 	}
 
-	public void setTargetRotation(float x, float y) {
-		rotationAngleX += x;
+	private void setTargetRotation(float x, float y) {
+		lastTargetRotation = targetRotation;
 
-		if (rotationAngleX > 360.0f || rotationAngleX < -360.0f) {
-			rotationAngleX = 0;
-		}
-
-		rotationAngleY += y;
-
-		if (rotationAngleY > 360.0f || rotationAngleY < -360.0f) {
-			rotationAngleY = 0.0f;
-		}
+		rotationAngleX = x;
+		rotationAngleY = y;
 
 		targetRotation = Quaternion.Euler(rotationAngleX, rotationAngleY, 0.0f);
 
-		hasBeenRotated = true;
+		needsToRotate = true;
+	}
+
+	public void addTargetRotation(float x, float y) {
+		x += rotationAngleX;
+		y += rotationAngleY;
+
+		setTargetRotation(x, y);
 	}
 
 	private void doRotation() {
-		if (Time.timeScale < float.Epsilon || !hasBeenRotated || !activeForm) {
+		if (Time.timeScale < float.Epsilon || !needsToRotate || !activeForm) {
 			return;
 		}
 
-		if (smoothRotation && rotationSmoothAmount > 0.0f) {
-			activeForm.rotation = Quaternion.Slerp(activeForm.rotation, targetRotation, rotationSmoothAmount * Time.deltaTime);
+		if (activeForm.rotation == targetRotation) {
+			rotationInterpolation = 0.0f;
+			return;
+		}
 
-			float difference = targetRotation.eulerAngles.magnitude - activeForm.rotation.eulerAngles.magnitude;
+		if (smoothRotation && interpolationDuration > 0.0f) {
+			if (rotationInterpolation <= interpolationDuration) {
+				rotationInterpolation += Time.deltaTime;
 
-			if (Mathf.Abs(difference) <= differenceThreshold) {
+				float percentage = Mathf.Clamp01(rotationInterpolation / interpolationDuration);
+				activeForm.rotation = Quaternion.Slerp(lastTargetRotation, targetRotation, easeCurve.Evaluate(percentage));
+			} else {
 				activeForm.rotation = targetRotation;
+				rotationInterpolation = 0.0f;
 			}
 		} else {
 			activeForm.rotation = targetRotation;
 		}
 	}
 
-	public void setTargetScale(float x, float y, float z) {
-		targetScale.x = Mathf.Clamp(targetScale.x * x, scaleLimits.x, scaleLimits.y);
-		targetScale.y = Mathf.Clamp(targetScale.y * y, scaleLimits.x, scaleLimits.y);
-		targetScale.z = Mathf.Clamp(targetScale.z * z, scaleLimits.x, scaleLimits.y);
+	private void setTargetScale(float x, float y, float z) {
+		lastTargetScale = targetScale;
 
-		hasBeenScaled = true;
+		targetScale.x = Mathf.Clamp(x, scaleLimits.x, scaleLimits.y);
+		targetScale.y = Mathf.Clamp(y, scaleLimits.x, scaleLimits.y);
+		targetScale.z = Mathf.Clamp(z, scaleLimits.x, scaleLimits.y);
+
+		needsToScale = true;
+	}
+
+	public void addTargetScale(float x, float y, float z) {
+		x *= targetScale.x;
+		y *= targetScale.y;
+		z *= targetScale.z;
+
+		setTargetScale(x, y, z);
 	}
 
 	private void doScaling() {
-		if (Time.timeScale < float.Epsilon || !hasBeenScaled || !activeForm) {
+		if (Time.timeScale < float.Epsilon || !needsToScale || !activeForm) {
 			return;
 		}
 
-		if (smoothScale && scaleSmoothAmount > 0.0f) {
-			activeForm.localScale = Vector3.Lerp(activeForm.localScale, targetScale, scaleSmoothAmount * Time.deltaTime);
+		if (activeForm.localScale == targetScale) {
+			scaleInterpolation = 0.0f;
+			return;
+		}
 
-			float difference = targetScale.magnitude - activeForm.localScale.magnitude;
+		if (smoothScale && interpolationDuration > 0.0f) {
+			if (scaleInterpolation <= interpolationDuration) {
+				scaleInterpolation += Time.deltaTime;
 
-			if (Mathf.Abs(difference) <= differenceThreshold) {
+				float percentage = Mathf.Clamp01(scaleInterpolation / interpolationDuration);
+				activeForm.localScale = Vector3.Lerp(lastTargetScale, targetScale, easeCurve.Evaluate(percentage));
+			} else {
 				activeForm.localScale = targetScale;
+				scaleInterpolation = 0.0f;
 			}
 		} else {
 			activeForm.localScale = targetScale;

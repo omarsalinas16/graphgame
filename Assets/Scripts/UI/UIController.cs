@@ -1,10 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
 	public static UIController Instance { get; private set; }
+
+	[SerializeField]
+	private Button solveButton;
 
 	[Header("Try Toggles")]
 	[SerializeField]
@@ -18,6 +19,8 @@ public class UIController : MonoBehaviour {
 
 	[Header("Position Fields")]
 	[SerializeField]
+	private Button positionButton;
+	[SerializeField]
 	private InputField xPosition;
 	[SerializeField]
 	private InputField yPosition;
@@ -26,6 +29,8 @@ public class UIController : MonoBehaviour {
 
 	[Header("Rotation Fields")]
 	[SerializeField]
+	private Button rotateButton;
+	[SerializeField]
 	private InputField xRotation;
 	[SerializeField]
 	private InputField yRotation;
@@ -33,6 +38,8 @@ public class UIController : MonoBehaviour {
 	private InputField zRotation;
 
 	[Header("Scale Fields")]
+	[SerializeField]
+	private Button scaleButton;
 	[SerializeField]
 	private InputField xScale;
 	[SerializeField]
@@ -90,8 +97,31 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void runSolveTry() {
-		if (GameController.Instance) {
-			GameController.Instance.startPlaneSequence();
+		if (GameController.Instance && GameController.Instance.solveTryAttempts > 0) {
+			if (GameController.Instance.startPlaneSequence()) {
+				toggleSolveButton(false);
+				toggleTransformButtons(false);
+			}
+		}
+	}
+
+	public void toggleSolveButton(bool isActive) {
+		if (solveButton) {
+			solveButton.interactable = isActive;
+		}
+	}
+
+	public void toggleTransformButtons(bool isActive) {
+		if (positionButton) {
+			positionButton.interactable = isActive;
+		}
+
+		if (rotateButton) {
+			rotateButton.interactable = isActive;
+		}
+
+		if (scaleButton) {
+			scaleButton.interactable = isActive;
 		}
 	}
 
@@ -120,7 +150,7 @@ public class UIController : MonoBehaviour {
 			GameController.Instance.transformAttempts--;
 
 			if (PlayerController.Instance) {
-				PlayerController.Instance.setTargetTranslate(x, y, z);
+				PlayerController.Instance.addTargetTranslate(x, y, z);
 			}
 		}
 	}
@@ -145,7 +175,7 @@ public class UIController : MonoBehaviour {
 			GameController.Instance.transformAttempts--;
 
 			if (PlayerController.Instance) {
-				PlayerController.Instance.setTargetRotation(x, y);
+				PlayerController.Instance.addTargetRotation(x, y);
 			}
 		}
 	}
@@ -175,7 +205,7 @@ public class UIController : MonoBehaviour {
 			GameController.Instance.transformAttempts--;
 
 			if (PlayerController.Instance) {
-				PlayerController.Instance.setTargetScale(x, y, z);
+				PlayerController.Instance.addTargetScale(x, y, z);
 			}
 		}
 	}

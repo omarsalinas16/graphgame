@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Parabox.CSG;
 
 public enum PlaneSequenceStatus {
@@ -31,7 +29,7 @@ public class GameController : MonoBehaviour {
 		}
 
 		set {
-			_solveTryAttempts = value < 0 ? 0 : value;
+			_solveTryAttempts = Mathf.Clamp(value, 0, maxSolveTryAttempts);
 
 			if (UIController.Instance) {
 				UIController.Instance.setSolveTryAttempts(_solveTryAttempts);
@@ -49,7 +47,7 @@ public class GameController : MonoBehaviour {
 		}
 
 		set {
-			_transformAttempts = value < 0 ? 0 : value;
+			_transformAttempts = Mathf.Clamp(value, 0, maxTransformAttempts);
 
 			if (UIController.Instance) {
 				UIController.Instance.setTransformAttempsLabel(_transformAttempts);
@@ -156,13 +154,17 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
-	public void startPlaneSequence() {
-		if (solveTryAttempts > 0 && 
+	public bool startPlaneSequence() {
+		if (solveTryAttempts > 0 &&
 			planeSequenceStatus == PlaneSequenceStatus.Idle &&
 			xPlaneBehaviour.planeStatus == PlaneStatus.Idle &&
-			zPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
+			zPlaneBehaviour.planeStatus == PlaneStatus.Idle
+		) {
 			planeSequenceStatus = PlaneSequenceStatus.MovingX;
+			return true;
 		}
+
+		return false;
 	}
 
 	private void handlePlaneSequence() {
@@ -173,17 +175,20 @@ public class GameController : MonoBehaviour {
 				solveTryAttempts--;
 				Debug.Log("Lose!");
 			}
-			
+
 			planeSequenceStatus = PlaneSequenceStatus.Idle;
+
+			if (solveTryAttempts > 0 && UIController.Instance) {
+				UIController.Instance.toggleSolveButton(true);
+				UIController.Instance.toggleTransformButtons(true);
+			}
 		}
 
 		if (planeSequenceStatus > PlaneSequenceStatus.Idle && planeSequenceStatus < PlaneSequenceStatus.Ended) {
 			if (planeSequenceStatus == PlaneSequenceStatus.MovingX) {
 				if (xPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
 					xPlaneBehaviour.planeStatus = PlaneStatus.Move;
-				}
-
-				if (xPlaneBehaviour.planeStatus == PlaneStatus.Ended) {
+				} else if (xPlaneBehaviour.planeStatus == PlaneStatus.Ended) {
 					planeSequenceStatus = PlaneSequenceStatus.MovingZ;
 				}
 			}
@@ -191,9 +196,7 @@ public class GameController : MonoBehaviour {
 			if (planeSequenceStatus == PlaneSequenceStatus.MovingZ) {
 				if (zPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
 					zPlaneBehaviour.planeStatus = PlaneStatus.Move;
-				}
-
-				if (zPlaneBehaviour.planeStatus == PlaneStatus.Ended) {
+				} else if (zPlaneBehaviour.planeStatus == PlaneStatus.Ended) {
 					planeSequenceStatus = PlaneSequenceStatus.Ended;
 				}
 			}
