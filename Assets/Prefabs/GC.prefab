@@ -102,7 +102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activeForm: {fileID: 0}
-  interpolationDuration: 0.7
+  interpolationDuration: 0.75
   easeCurve:
     serializedVersion: 2
     m_Curve:
