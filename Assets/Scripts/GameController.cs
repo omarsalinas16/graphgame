@@ -75,16 +75,15 @@ public class GameController : MonoBehaviour {
 
 	public PlaneSequenceStatus planeSequenceStatus = PlaneSequenceStatus.Idle;
 
-	[Header("Shapes")]
+	[Header("Level")]
+	public Level currentLevel = null;
+
+	[Header("Forms")]
 	[SerializeField]
 	private string formTag = "Form";
 	[SerializeField]
 	private float scaleOffsetFix = 0.05f;
-	[SerializeField]
-	private Form[] forms;
 	private Transform activeForm;
-
-	private int shapeIndex = 0;
 
 	private void Awake() {
 		if (Instance != null && Instance != this)
@@ -94,7 +93,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void Start() {
-		spawnForm();
+		setAndInitCurrentLevel();
 
 		if (xPlane) {
 			xPlaneBehaviour = xPlane.GetComponent<PlaneBehaviour>();
@@ -106,13 +105,13 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (Input.GetKey("l") ) {
+		if (Input.GetKey("l")) {
 			modifyMeshCube();
 		}
-		if (Input.GetKey("p") ) {
+		if (Input.GetKey("p")) {
 			scanFigure();
 		}
-		
+
 		handlePlaneSequence();
 	}
 
@@ -120,58 +119,55 @@ public class GameController : MonoBehaviour {
 		makeHole(xPlane, Vector3.right);
 		makeHole(zPlane, Vector3.forward);
 	}
-	
+
 	private void modifyMeshCube() {
 		MeshFilter meshFilter = activeForm.gameObject.GetComponent<MeshFilter>();
-		var collider    = activeForm.gameObject.GetComponent<MeshCollider>();
-		var boxCollider    = activeForm.gameObject.GetComponent<BoxCollider>();
+		var collider = activeForm.gameObject.GetComponent<MeshCollider>();
+		var boxCollider = activeForm.gameObject.GetComponent<BoxCollider>();
 		boxCollider.enabled = false;
-		
-		
-		if(!collider) {
-			collider    = activeForm.gameObject.AddComponent<MeshCollider>();
+
+		if (!collider) {
+			collider = activeForm.gameObject.AddComponent<MeshCollider>();
 			collider.sharedMesh = meshFilter.mesh;
-		}
-		else 
+		} else
 			Debug.Log("NO IT DOESNT");
 		//collider.sharedMesh = myMesh;
-		
+
 	}
-	
+
 	private void scanFigure() {
-		
 		Vector3 originalPos = activeForm.gameObject.transform.position;
-		Renderer rend   = activeForm.gameObject.GetComponent<Renderer>();
-		Bounds bounds   = rend.bounds;
-		
-		Vector3 center  = bounds.center;
-		Vector3 extents = rend.bounds.extents;	
-		Vector3 begin   = center - extents;
-		
-		float jumpsZ  = 0.1f;
-		float jumpsY  = 0.1f;
-		
+		Renderer rend = activeForm.gameObject.GetComponent<Renderer>();
+		Bounds bounds = rend.bounds;
+
+		Vector3 center = bounds.center;
+		Vector3 extents = rend.bounds.extents;
+		Vector3 begin = center - extents;
+
+		float jumpsZ = 0.1f;
+		float jumpsY = 0.1f;
+
 		List<RaycastHit> listRaycast = new List<RaycastHit>();
 		float limitZ = begin.z + (extents.z * 2);
 		float limitY = begin.y + (extents.y * 2);
 		float XFIJO = -2.0f;
-		
+
 		List<Int32> trianglesDetected = new List<Int32>();
-		
+
 		//collider of cube
-		var colliderCube    = activeForm.gameObject.GetComponent<MeshCollider>();
-		for(float z = begin.z; z < limitZ;z+=jumpsZ) {
-			for(float y = begin.y; y < limitY;y+=jumpsY) {
+		var colliderCube = activeForm.gameObject.GetComponent<MeshCollider>();
+		for (float z = begin.z; z < limitZ; z += jumpsZ) {
+			for (float y = begin.y; y < limitY; y += jumpsY) {
 				RaycastHit hitN;
-				Vector3 point = new Vector3(XFIJO,y,z);
+				Vector3 point = new Vector3(XFIJO, y, z);
 				//Debug.Log(point);
-				if(Physics.Raycast(point, Vector3.right, out hitN)) {
+				if (Physics.Raycast(point, Vector3.right, out hitN)) {
 					triangleIndex = hitN.triangleIndex;
 					//Debug.Log(hitN.distance);
 					//Debug.Log(hitN.triangleIndex);
-					
-					if(!listRaycast.Exists(ExistsTriangleIndex)) {
-						if(hitN.collider == colliderCube) {
+
+					if (!listRaycast.Exists(ExistsTriangleIndex)) {
+						if (hitN.collider == colliderCube) {
 							trianglesDetected.Add(hitN.triangleIndex);
 							//Debug.Log("Si esta llenando la lista de triangulos");
 						}
@@ -184,56 +180,56 @@ public class GameController : MonoBehaviour {
 		}
 		RaycastHit hit = listRaycast[0];
 		MeshCollider meshCollider = hit.collider as MeshCollider;
-        if (meshCollider == null || meshCollider.sharedMesh == null) {
-            Debug.Log("Is returning");
+		if (meshCollider == null || meshCollider.sharedMesh == null) {
+			Debug.Log("Is returning");
 			return;
 		}
 		Mesh mesh = colliderCube.sharedMesh;
 		Vector3[] vertices = mesh.vertices;
 		int[] triangles = mesh.triangles;
 		Debug.Log("Vertices length: " + vertices.Length);
-		
-		
-		
+
+
+
 		List<Int32> convertidos = new List<Int32>();
 		//Debug.Log(listRaycast.Count);
-		
-		for(int z = 0; z < vertices.Length; z++) {
+
+		for (int z = 0; z < vertices.Length; z++) {
 			//Debug.Log("Vertex: " + z + " : " + vertices[z]);
 		}
-		
+
 		Debug.Log("Division");
-        foreach(RaycastHit r in listRaycast) {
-			
-			
+		foreach (RaycastHit r in listRaycast) {
+
+
 			//Vector3 p0 = vertices[triangles[hit.triangleIndex * 3 + 0]];
 			//Vector3 p1 = vertices[triangles[hit.triangleIndex * 3 + 1]];
 			//Vector3 p2 = vertices[triangles[hit.triangleIndex * 3 + 2]];
 			//Debug.Log("Si entro");
-			
-			for(int hj = 0; hj < 3; hj++) {
+
+			for (int hj = 0; hj < 3; hj++) {
 				int vertexIndex = triangles[r.triangleIndex * 3 + hj];
 				vertexIndexGlobal = vertexIndex;
-				if(convertidos.Exists(HasInt)) {
+				if (convertidos.Exists(HasInt)) {
 					//Debug.Log("Si entra");
 					//Vector3 v1 = vertices[vertexIndex];
 					//Debug.Log("No entra porque ya lo hizo: " + v1);
-					
+
 					continue;
 				}
 				Vector3 v = vertices[vertexIndex];
 				//Debug.Log(v);
 				List<Int32> repetidos = new List<Int32>();
 				repetidos.Add(vertexIndex);
-				for(int k = 0; k < vertices.Length; k++) {
-					
-					if(k != vertexIndex && vector3Comparition(v,vertices[k])) {
-						
+				for (int k = 0; k < vertices.Length; k++) {
+
+					if (k != vertexIndex && vector3Comparition(v, vertices[k])) {
+
 						repetidos.Add(k);
 					}
 				}
 				//Debug.Log("New");
-				foreach(Int32 vIndex in repetidos) {
+				foreach (Int32 vIndex in repetidos) {
 					Debug.Log("Vertex: " + vIndex + " : " + vertices[vIndex]);
 					Vector3 vectorToTransform = activeForm.gameObject.transform.TransformPoint(vertices[vIndex]);
 					vectorToTransform.x = -3f;
@@ -245,7 +241,7 @@ public class GameController : MonoBehaviour {
 				}
 				convertidos.AddRange(repetidos);
 			}
-			
+
 			/*
 			Debug.Log(vertices[triangles[hit.triangleIndex * 3 + 0]].x);
 			Debug.Log(vertices[triangles[hit.triangleIndex * 3 + 1]].x);
@@ -266,16 +262,16 @@ public class GameController : MonoBehaviour {
 			Debug.Log(v0.x);
 			Debug.Log(v1.x);
 			Debug.Log(v2.x);*/
-			
-			
-			
+
+
+
 			/*vertices[triangles[hit.triangleIndex * 3 + 0]].x = -0.2f;
 			vertices[triangles[hit.triangleIndex * 3 + 1]].x = -0.2f;
 			vertices[triangles[hit.triangleIndex * 3 + 2]].x = -0.2f;
 			Debug.Log(vertices[triangles[hit.triangleIndex * 3 + 0]].x);
 			Debug.Log(vertices[triangles[hit.triangleIndex * 3 + 1]].x);
 			Debug.Log(vertices[triangles[hit.triangleIndex * 3 + 2]].x);*/
-			
+
 			/*
 			Transform hitTransform = hit.collider.transform;
 			p0 = hitTransform.TransformPoint(p0);
@@ -285,7 +281,7 @@ public class GameController : MonoBehaviour {
 			Debug.DrawLine(p1, p2);
 			Debug.DrawLine(p2, p0);	*/
 		}
-		for(int z = 0; z < vertices.Length; z++) {
+		for (int z = 0; z < vertices.Length; z++) {
 			//Debug.Log("Vertex: " + z + " : " + vertices[z]);
 		}
 		/*
@@ -296,22 +292,21 @@ public class GameController : MonoBehaviour {
 		mesh.RecalculateBounds();
 		//colliderCube.sharedMesh = null;
 		colliderCube.sharedMesh = mesh;
-		
-			
-		
+
+
+
 	}
-	
-	private bool vector3Comparition(Vector3 v1,Vector3 v2) {
+
+	private bool vector3Comparition(Vector3 v1, Vector3 v2) {
 		return (v1.x == v2.x && v1.y == v2.y && v1.z == v2.z);
-		
 	}
-	
+
 	int triangleIndex;
-	
+
 	private bool ExistsTriangleIndex(RaycastHit r) {
 		return r.triangleIndex == triangleIndex;
 	}
-	
+
 	int vertexIndexGlobal;
 	private bool HasInt(Int32 i) {
 		return i == vertexIndexGlobal;
@@ -408,60 +403,58 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
-	private void initSolveTryAttempts() {
+	private void resetSolveTryAttempts() {
 		solveTryAttempts = maxSolveTryAttempts;
 	}
 
-	public void initTransformAttempts() {
+	public void resetTransformAttempts() {
 		transformAttempts = maxTransformAttempts;
 	}
 
-	private void spawnForm() {
-		instantiateForm();
-		setFormToSolution();
-		makeBothHoles();
-		fadeInForm();
-		setFormToIdentity();
-	}
+	private void setAndInitCurrentLevel() {
+		if (LevelController.Instance) {
+			currentLevel = LevelController.Instance.getCurrentLevel();
+		}
 
-	private void instantiateForm() {
-		if (forms.Length > 0 && shapeIndex >= 0) {
-			Form selectedForm = forms[shapeIndex];
-
-			activeForm = Instantiate(selectedForm.shape, formSpawn.position, Quaternion.identity, formSpawn);
+		if (currentLevel != null) {
+			activeForm = Instantiate(currentLevel.form, formSpawn.position, Quaternion.identity, formSpawn);
 
 			if (PlayerController.Instance) {
 				PlayerController.Instance.setActiveForm(getActiveForm());
 			}
 
-			initSolveTryAttempts();
-			initTransformAttempts();
+			if (activeForm != null) {
+				setFormToSolution();
+				makeBothHoles();
+				fadeInForm();
+				setFormToStartPosition();
+			}
+
+			maxSolveTryAttempts = currentLevel.maxSolveAttempts;
+			transformAttempts = currentLevel.maxTransformations;
+
+			resetSolveTryAttempts();
+			resetTransformAttempts();
 		}
 	}
 
 	private void setFormToSolution() {
-		if (activeForm && forms[shapeIndex] != null) {
-			activeForm.localPosition = forms[shapeIndex].position;
-			activeForm.Rotate(forms[shapeIndex].rotation);
+		activeForm.localPosition = currentLevel.position;
+		activeForm.Rotate(currentLevel.rotation);
 
-			// Temporal scale fix for plane colliders.
-			activeForm.localScale = forms[shapeIndex].scale + new Vector3(scaleOffsetFix, scaleOffsetFix, scaleOffsetFix);
-		}
+		// Temporal scale fix for plane colliders.
+		activeForm.localScale = currentLevel.scale + new Vector3(scaleOffsetFix, scaleOffsetFix, scaleOffsetFix);
 	}
 
-	private void setFormToIdentity() {
-		if (activeForm) {
-			activeForm.localPosition = Vector3.zero;
-			activeForm.rotation = Quaternion.identity;
-			activeForm.localScale = Vector3.one;
-		}
+	private void setFormToStartPosition() {
+		activeForm.localPosition = currentLevel.startPosition;
+		activeForm.Rotate(currentLevel.startRotation);
+		activeForm.localScale = currentLevel.startScale;
 	}
 
 	private void fadeInForm() {
-		if (activeForm) {
-			if (FormBehaviour.Instance) {
-				FormBehaviour.Instance.fadeIn(activeForm);
-			}
+		if (FormBehaviour.Instance) {
+			FormBehaviour.Instance.fadeIn(activeForm);
 		}
 	}
 
@@ -470,11 +463,6 @@ public class GameController : MonoBehaviour {
 
 		if (FormBehaviour.Instance) {
 			FormBehaviour.Instance.fadeOut(activeForm);
-		}
-
-		if (shapeIndex < forms.Length - 1) {
-			shapeIndex++;
-			instantiateForm();
 		}
 	}
 

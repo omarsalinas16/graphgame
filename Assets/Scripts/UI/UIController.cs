@@ -212,7 +212,7 @@ public class UIController : MonoBehaviour {
 
 	public void resetAll() {
 		if (GameController.Instance) {
-			GameController.Instance.initTransformAttempts();
+			GameController.Instance.resetTransformAttempts();
 		}
 
 		if (PlayerController.Instance) {
