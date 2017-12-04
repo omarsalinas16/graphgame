@@ -47,13 +47,18 @@ public class LookAtCamera : MonoBehaviour {
 	private float transformTargetScroll;
 
 	private void Awake() {
-		if (Instance != null && Instance != this)
+		if (Instance != null && Instance != this) {
 			Destroy(gameObject);
+		}
 
 		Instance = this;
 	}
 
 	private void Start() {
+		// Delegates and event suscriptions
+
+		UIController.Instance.resetGameEvent += resetCameraPosition;
+
 		if (mainCamera == null) {
 			mainCamera = Camera.main;
 		}

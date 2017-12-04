@@ -1,8 +1,23 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
 	public static UIController Instance { get; private set; }
+
+	private GameController gameController;
+
+	public delegate void OnPositionChanged(float x, float y, float z);
+	public event OnPositionChanged positionChangedEvent;
+
+	public delegate void OnRotationChanged(float x, float y);
+	public event OnRotationChanged rotationChangedEvent;
+
+	public delegate void OnScaleChanged(float x, float y, float z);
+	public event OnScaleChanged scalenChangedEvent;
+
+	public delegate void OnResetGame();
+	public event OnResetGame resetGameEvent;
 
 	[SerializeField]
 	private Button solveButton;
@@ -21,40 +36,36 @@ public class UIController : MonoBehaviour {
 	[SerializeField]
 	private Button positionButton;
 	[SerializeField]
-	private InputField xPosition;
-	[SerializeField]
-	private InputField yPosition;
-	[SerializeField]
-	private InputField zPosition;
+	private InputField[] positionInputs = new InputField[3];
 
 	[Header("Rotation Fields")]
 	[SerializeField]
 	private Button rotateButton;
 	[SerializeField]
-	private InputField xRotation;
-	[SerializeField]
-	private InputField yRotation;
-	[SerializeField]
-	private InputField zRotation;
+	private InputField[] rotationInputs = new InputField[2];
 
 	[Header("Scale Fields")]
 	[SerializeField]
 	private Button scaleButton;
 	[SerializeField]
-	private InputField xScale;
-	[SerializeField]
-	private InputField yScale;
-	[SerializeField]
-	private InputField zScale;
+	private InputField[] scaleInputs = new InputField[3];
 
 	private void Awake() {
-		if (Instance != null && Instance != this)
+		if (Instance != null && Instance != this) {
 			Destroy(gameObject);
+		}
 
 		Instance = this;
+
+		// Delegates and event suscriptions
+		
+		gameController = GameController.Instance;
+
+		gameController.tryAttemptsChangedEvent += setTryAttemptsLabel;
+		gameController.transformAttemptsChangedEvent += setTransformAttempsLabel;
 	}
 
-	public void setSolveTryAttempts(int amount) {
+	public void setTryAttemptsLabel(int amount) {
 		int i = 0;
 
 		if (tryTogglesParent.childCount < amount) {
@@ -97,8 +108,8 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void runSolveTry() {
-		if (GameController.Instance && GameController.Instance.solveTryAttempts > 0) {
-			if (GameController.Instance.startPlaneSequence()) {
+		if (gameController && gameController.solveTryAttempts > 0) {
+			if (gameController.startPlaneSequence()) {
 				toggleSolveButton(false);
 				toggleTransformButtons(false);
 			}
@@ -125,102 +136,49 @@ public class UIController : MonoBehaviour {
 		}
 	}
 
+	private float readInputValue(InputField input) {
+		string inputText = input.text;
+		input.text = null;
+
+		return (!string.IsNullOrEmpty(inputText)) ? float.Parse(inputText) : 0.0f;
+	}
+
 	public void setPosition() {
-		float x = 0.0f;
-		float y = 0.0f;
-		float z = 0.0f;
+		float[] inputValues = positionInputs.Select(readInputValue).ToArray();
 
-		if (!string.IsNullOrEmpty(xPosition.text)) {
-			x = float.Parse(xPosition.text);
-		}
-
-		if (!string.IsNullOrEmpty(yPosition.text)) {
-			y = float.Parse(yPosition.text);
-		}
-
-		if (!string.IsNullOrEmpty(zPosition.text)) {
-			z = float.Parse(zPosition.text);
-		}
-
-		xPosition.text = null;
-		yPosition.text = null;
-		zPosition.text = null;
-
-		if (GameController.Instance.transformAttempts > 0) {
-			GameController.Instance.transformAttempts--;
-
-			if (PlayerController.Instance) {
-				PlayerController.Instance.addTargetTranslate(x, y, z);
+		if (gameController.substractAndTestTransformAttempts()) {
+			if (positionChangedEvent != null && inputValues.Length == positionInputs.Length) {
+				positionChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
 			}
 		}
 	}
 
 	public void setRotation() {
-		float x = 0.0f;
-		float y = 0.0f;
+		float[] inputValues = rotationInputs.Select(readInputValue).ToArray();
 
-		if (!string.IsNullOrEmpty(xRotation.text)) {
-			x = float.Parse(xRotation.text);
-		}
-
-		if (!string.IsNullOrEmpty(yRotation.text)) {
-			y = float.Parse(yRotation.text);
-		}
-
-		xRotation.text = null;
-		yRotation.text = null;
-		zRotation.text = null;
-
-		if (GameController.Instance.transformAttempts > 0) {
-			GameController.Instance.transformAttempts--;
-
-			if (PlayerController.Instance) {
-				PlayerController.Instance.addTargetRotation(x, y);
+		if (gameController.substractAndTestTransformAttempts()) {
+			if (rotationChangedEvent != null && inputValues.Length == rotationInputs.Length) {
+				rotationChangedEvent(inputValues[0], inputValues[1]);
 			}
 		}
 	}
 
 	public void setScale() {
-		float x = 1.0f;
-		float y = 1.0f;
-		float z = 1.0f;
+		float[] inputValues = scaleInputs.Select(input => {
+			float value = readInputValue(input);
+			return value == 0.0f ? 1.0f : value; 
+		}).ToArray();
 
-		if (!string.IsNullOrEmpty(xScale.text)) {
-			x = float.Parse(xScale.text);
-		}
-
-		if (!string.IsNullOrEmpty(yScale.text)) {
-			y = float.Parse(yScale.text);
-		}
-
-		if (!string.IsNullOrEmpty(zScale.text)) {
-			z = float.Parse(zScale.text);
-		}
-
-		xScale.text = null;
-		yScale.text = null;
-		zScale.text = null;
-
-		if (GameController.Instance.transformAttempts > 0) {
-			GameController.Instance.transformAttempts--;
-
-			if (PlayerController.Instance) {
-				PlayerController.Instance.addTargetScale(x, y, z);
+		if (gameController.substractAndTestTransformAttempts()) {
+			if (scalenChangedEvent != null && inputValues.Length == scaleInputs.Length) {
+				scalenChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
 			}
 		}
 	}
 
 	public void resetAll() {
-		if (GameController.Instance) {
-			GameController.Instance.resetTransformAttempts();
-		}
-
-		if (PlayerController.Instance) {
-			PlayerController.Instance.initTargetTransforms();
-		}
-
-		if (LookAtCamera.Instance) {
-			LookAtCamera.Instance.resetCameraPosition();
+		if (resetGameEvent != null) {
+			resetGameEvent();
 		}
 	}
 }

@@ -16,6 +16,12 @@ public enum PlaneSequenceStatus {
 public class GameController : MonoBehaviour {
 	public static GameController Instance { get; private set; }
 
+	public delegate void OnTryAttemptsChanged(int attempts);
+	public event OnTryAttemptsChanged tryAttemptsChangedEvent;
+
+	public delegate void OnTransformAttemptsChanged(int attempts);
+	public event OnTransformAttemptsChanged transformAttemptsChangedEvent;
+
 	[Header("Requirements")]
 	[SerializeField]
 	private Transform formSpawn;
@@ -33,8 +39,8 @@ public class GameController : MonoBehaviour {
 		set {
 			_solveTryAttempts = Mathf.Clamp(value, 0, maxSolveTryAttempts);
 
-			if (UIController.Instance) {
-				UIController.Instance.setSolveTryAttempts(_solveTryAttempts);
+			if (tryAttemptsChangedEvent != null) {
+				tryAttemptsChangedEvent(_solveTryAttempts);
 			}
 		}
 	}
@@ -51,8 +57,8 @@ public class GameController : MonoBehaviour {
 		set {
 			_transformAttempts = Mathf.Clamp(value, 0, maxTransformAttempts);
 
-			if (UIController.Instance) {
-				UIController.Instance.setTransformAttempsLabel(_transformAttempts);
+			if (transformAttemptsChangedEvent != null) {
+				transformAttemptsChangedEvent(_transformAttempts);
 			}
 		}
 	}
@@ -93,7 +99,9 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void Start() {
-		setAndInitCurrentLevel();
+		// Delegates and event suscriptions
+
+		UIController.Instance.resetGameEvent += resetTransformAttempts;
 
 		if (xPlane) {
 			xPlaneBehaviour = xPlane.GetComponent<PlaneBehaviour>();
@@ -102,6 +110,8 @@ public class GameController : MonoBehaviour {
 		if (zPlane) {
 			zPlaneBehaviour = zPlane.GetComponent<PlaneBehaviour>();
 		}
+
+		setAndInitCurrentLevel();
 	}
 
 	private void Update() {
@@ -405,6 +415,10 @@ public class GameController : MonoBehaviour {
 
 	private void resetSolveTryAttempts() {
 		solveTryAttempts = maxSolveTryAttempts;
+	}
+
+	public bool substractAndTestTransformAttempts() {
+		return (--transformAttempts > 0);
 	}
 
 	public void resetTransformAttempts() {

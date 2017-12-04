@@ -105,10 +105,23 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void Awake() {
-		if (Instance != null && Instance != this)
+		if (Instance != null && Instance != this) {
 			Destroy(gameObject);
+		}
 
 		Instance = this;
+	}
+
+	private void Start() {
+		// Delegates and event suscriptions
+
+		UIController uiController = UIController.Instance;
+
+		uiController.positionChangedEvent += addTargetTranslate;
+		uiController.rotationChangedEvent += addTargetRotation;
+		uiController.scalenChangedEvent += addTargetScale;
+
+		uiController.resetGameEvent += initTargetTransforms;
 	}
 
 	private void Update() {
