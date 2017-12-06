@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using DG.Tweening;
 
 public class LookAtCamera : MonoBehaviour {
 	public static LookAtCamera Instance { get; private set; }
@@ -36,10 +35,6 @@ public class LookAtCamera : MonoBehaviour {
 	private float maxZoom = 10.0f;
 
 	[Header("Camera Shake")]
-	[SerializeField]
-	private float shakeAmount = 2.0f;
-	private Vector3 lastCameraLocalPosition;
-
 	private float lookAngleX = 0.0f;
 	private float lookAngleY = 0.0f;
 
@@ -153,27 +148,7 @@ public class LookAtCamera : MonoBehaviour {
 		setTargetRotation(startAngle);
 	}
 
-	public void shakeCamera(float amount, float duration) {
-		shakeAmount = amount;
-		lastCameraLocalPosition = mainCamera.transform.localPosition;
-
-		InvokeRepeating("beginShake", 0.0f, 0.01f);
-		Invoke("stopShake", duration);
-	}
-
-	private void beginShake() {
-		if (shakeAmount > 0.0f) {
-			Vector3 cameraShakePosition = mainCamera.transform.position;
-
-			cameraShakePosition.x += Random.value * shakeAmount * 2.0f - shakeAmount;
-			cameraShakePosition.z += Random.value * shakeAmount * 2.0f - shakeAmount;
-
-			mainCamera.transform.position = cameraShakePosition;
-		}
-	}
-
-	private void stopShake() {
-		CancelInvoke("beginShake");
-		mainCamera.transform.localPosition = lastCameraLocalPosition;
+	public void shakeCamera(float duration, float amount = 1, int vibrato = 10, float randomness = 90) {
+		mainCamera.transform.DOShakePosition(duration, amount, vibrato, randomness);
 	}
 }

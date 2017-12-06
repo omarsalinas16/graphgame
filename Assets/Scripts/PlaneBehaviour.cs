@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using DG.Tweening;
 
 public enum PlaneStatus {
 	Idle = 0,
@@ -25,22 +26,11 @@ public class PlaneBehaviour : MonoBehaviour {
 
 	[Header("Interpolation")]
 	[SerializeField]
-	private AnimationCurve easeCurve;
+	private float interpolationDuration = 1.0f;
 	[SerializeField]
-	private float lerpDuration;
+	private Ease interpolationEase = Ease.OutCubic;
 	[SerializeField]
 	private float delayDuration = 0.2f;
-
-	private float _currentLerpTime = 0.0f;
-	private float currentLerpTime {
-		get {
-			return _currentLerpTime;
-		}
-
-		set {
-			_currentLerpTime = Mathf.Clamp(value, 0.0f, lerpDuration);
-		}
-	}
 
 	private float _currentDelayTime = 0.0f;
 	private float currentDelayTime {
@@ -53,49 +43,29 @@ public class PlaneBehaviour : MonoBehaviour {
 		}
 	}
 
+	private bool issuedInterpolation = false;
 	private Vector3 startPosition;
 	private Vector3 endPosition;
-	private Vector3 targetPosition;
-	private Vector3 lastTargetPosition;
 
 	private void Start() {
 		startPosition = transform.position;
 		endPosition = startPosition + direction * (distanceToMove - planeWidth);
-
-		lastTargetPosition = startPosition;
-		targetPosition = endPosition;
 	}
 
 	private void Update() {
-		if (planeStatus == PlaneStatus.Ended) {
-			planeStatus = PlaneStatus.Idle;
-		} else if (planeStatus > PlaneStatus.Idle) {
-			if (currentDelayTime <= 0) {
-				if (currentLerpTime >= lerpDuration) {
-					transform.position = targetPosition;
-
-					if (planeStatus < PlaneStatus.Return) {
-						planeStatus = PlaneStatus.Return;
-
-						currentDelayTime = delayDuration;
-
-						lastTargetPosition = endPosition;
-						targetPosition = startPosition;
-					} else {
-						planeStatus = PlaneStatus.Ended;
-
+		if (planeStatus > PlaneStatus.Idle) {
+			if (currentDelayTime <= 0.0f) {
+				switch (planeStatus) {
+					case PlaneStatus.Move:
+						issueInterpolation(this.endPosition, PlaneStatus.Return);
+						break;
+					case PlaneStatus.Return:
+						issueInterpolation(this.startPosition, PlaneStatus.Ended);
+						break;
+					case PlaneStatus.Ended:
+						planeStatus = PlaneStatus.Idle;
 						currentDelayTime = 0.0f;
-
-						lastTargetPosition = startPosition;
-						targetPosition = endPosition;
-					}
-
-					currentLerpTime = 0.0f;
-				} else {
-					currentLerpTime += Time.deltaTime;
-
-					float percentage = Mathf.Clamp01(currentLerpTime / lerpDuration);
-					transform.position = Vector3.Lerp(lastTargetPosition, targetPosition, easeCurve.Evaluate(percentage));
+						break;
 				}
 			} else {
 				currentDelayTime -= Time.deltaTime;
@@ -103,21 +73,36 @@ public class PlaneBehaviour : MonoBehaviour {
 		}
 	}
 
+	private void issueInterpolation(Vector3 targetPosition, PlaneStatus targetStatus) {
+		if (!issuedInterpolation) {
+			issuedInterpolation = true;
+
+			transform.DOMove(targetPosition, interpolationDuration)
+				.SetEase(interpolationEase)
+				.OnComplete(() => onInterpolationEnd(targetStatus));
+		}
+	}
+
+	private void onInterpolationEnd(PlaneStatus nextStatus) {
+		planeStatus = nextStatus;
+		issuedInterpolation = false;
+		currentDelayTime = delayDuration;
+	}
+
 	private void OnTriggerEnter(Collider other) {
 		if (planeStatus == PlaneStatus.Move && other.CompareTag(formTag)) {
 			planeStatus = PlaneStatus.Return;
 
+			transform.DOKill();
+			issuedInterpolation = false;
 			currentDelayTime = 0.0f;
-
-			lastTargetPosition = transform.position;
-			targetPosition = startPosition;
 
 			if (GameController.Instance) {
 				GameController.Instance.planeSequenceStatus = PlaneSequenceStatus.Collided;
 			}
 
 			if (LookAtCamera.Instance) {
-				LookAtCamera.Instance.shakeCamera(0.2f, 0.25f);
+				LookAtCamera.Instance.shakeCamera(0.3f, vibrato: 30);
 			}
 		}
 	}

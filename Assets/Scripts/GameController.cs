@@ -22,6 +22,21 @@ public class GameController : MonoBehaviour {
 	public delegate void OnTransformAttemptsChanged(int attempts);
 	public event OnTransformAttemptsChanged transformAttemptsChangedEvent;
 
+	private FormBehaviour _formBehaviour = null;
+	private FormBehaviour formBehaviour {
+		get {
+			if (_formBehaviour == null) {
+				if (FormBehaviour.Instance != null) {
+					_formBehaviour = FormBehaviour.Instance;
+				} else {
+					_formBehaviour = FindObjectOfType<FormBehaviour>();
+				}
+			}
+
+			return _formBehaviour;
+		}
+	}
+
 	[Header("Requirements")]
 	[SerializeField]
 	private Transform formSpawn;
@@ -78,7 +93,7 @@ public class GameController : MonoBehaviour {
 
 	private PlaneBehaviour xPlaneBehaviour;
 	private PlaneBehaviour zPlaneBehaviour;
-
+	private bool issueMovePlane = false;
 	public PlaneSequenceStatus planeSequenceStatus = PlaneSequenceStatus.Idle;
 
 	[Header("Level")]
@@ -92,8 +107,9 @@ public class GameController : MonoBehaviour {
 	private Transform activeForm;
 
 	private void Awake() {
-		if (Instance != null && Instance != this)
+		if (Instance != null && Instance != this) {
 			Destroy(gameObject);
+		}
 
 		Instance = this;
 	}
@@ -380,13 +396,14 @@ public class GameController : MonoBehaviour {
 	private void handlePlaneSequence() {
 		if (planeSequenceStatus >= PlaneSequenceStatus.Ended) {
 			if (planeSequenceStatus == PlaneSequenceStatus.Ended) {
-				Debug.Log("Win!");
+				endCurrentLevel();
 			} else {
 				solveTryAttempts--;
 				Debug.Log("Lose!");
 			}
 
 			planeSequenceStatus = PlaneSequenceStatus.Idle;
+			issueMovePlane = false;
 
 			if (solveTryAttempts > 0 && UIController.Instance) {
 				UIController.Instance.toggleSolveButton(true);
@@ -397,16 +414,24 @@ public class GameController : MonoBehaviour {
 		if (planeSequenceStatus > PlaneSequenceStatus.Idle && planeSequenceStatus < PlaneSequenceStatus.Ended) {
 			if (planeSequenceStatus == PlaneSequenceStatus.MovingX) {
 				if (xPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
-					xPlaneBehaviour.planeStatus = PlaneStatus.Move;
+					if (!issueMovePlane) {
+						issueMovePlane = true;
+						xPlaneBehaviour.planeStatus = PlaneStatus.Move;
+					}
 				} else if (xPlaneBehaviour.planeStatus == PlaneStatus.Ended) {
+					issueMovePlane = false;
 					planeSequenceStatus = PlaneSequenceStatus.MovingZ;
 				}
 			}
 
 			if (planeSequenceStatus == PlaneSequenceStatus.MovingZ) {
 				if (zPlaneBehaviour.planeStatus == PlaneStatus.Idle) {
-					zPlaneBehaviour.planeStatus = PlaneStatus.Move;
+					if (!issueMovePlane) {
+						issueMovePlane = true;
+						zPlaneBehaviour.planeStatus = PlaneStatus.Move;
+					}
 				} else if (zPlaneBehaviour.planeStatus == PlaneStatus.Ended) {
+					issueMovePlane = false;
 					planeSequenceStatus = PlaneSequenceStatus.Ended;
 				}
 			}
@@ -440,8 +465,8 @@ public class GameController : MonoBehaviour {
 			if (activeForm != null) {
 				setFormToSolution();
 				makeBothHoles();
-				fadeInForm();
 				setFormToStartPosition();
+				fadeInForm();
 			}
 
 			maxSolveTryAttempts = currentLevel.maxSolveAttempts;
@@ -467,16 +492,16 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void fadeInForm() {
-		if (FormBehaviour.Instance) {
-			FormBehaviour.Instance.fadeIn(activeForm);
+		if (this.formBehaviour) {
+			this.formBehaviour.fadeIn(activeForm);
 		}
 	}
 
 	private void endCurrentLevel() {
 		Debug.Log("WIN");
 
-		if (FormBehaviour.Instance) {
-			FormBehaviour.Instance.fadeOut(activeForm);
+		if (this.formBehaviour) {
+			// this.formBehaviour.fadeOut(activeForm);
 		}
 	}
 
