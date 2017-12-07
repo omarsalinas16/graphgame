@@ -9,6 +9,7 @@ public enum PlaneStatus {
 }
 
 public class PlaneBehaviour : MonoBehaviour {
+
 	[SerializeField]
 	private string formTag = "Form";
 

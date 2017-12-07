@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UIIncrementalBehaviour : MonoBehaviour {
+
 	[SerializeField]
 	private InputField inputField;
 	[SerializeField]

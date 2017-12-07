@@ -54,12 +54,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeDuration: 2
-  differenceThreshold: 0.001
-  offsetMinMax: {x: -0.5, y: 0.5}
-  startAlpha: 0
-  endAlpha: 1
-  startSlide: -1
-  endSlide: 0
+  minAlpha: 0
+  maxAlpha: 1
+  minOffsetPosition: 0
+  maxOffsetPosition: -1
 --- !u!114 &114657431525198586
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -82,14 +80,19 @@ MonoBehaviour:
   axisPositionMax: 3
   axisStep: 0.3
   planeSequenceStatus: 0
+  currentLevel:
+    name: Level
+    form: {fileID: 0}
+    startPosition: {x: 0, y: 0, z: 0}
+    startRotation: {x: 0, y: 0, z: 0}
+    startScale: {x: 1, y: 1, z: 1}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    maxSolveAttempts: 1
+    maxTransformations: 1
   formTag: Form
   scaleOffsetFix: 0.05
-  forms:
-  - name: Cube
-    _shape: {fileID: 4541241259093008, guid: f5babc1efeda87d41beb64a7cbeac9c5, type: 2}
-    _position: {x: 0, y: 0, z: 0}
-    _rotation: {x: 0, y: 0, z: 0}
-    _scale: {x: 1, y: 1, z: 1}
 --- !u!114 &114988878724459848
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -103,27 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activeForm: {fileID: 0}
   interpolationDuration: 0.75
-  easeCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 2
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - serializedVersion: 2
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 0
-  smoothTranslate: 1
+  interpolationEase: 10
   translateLimitsMin: {x: -2, y: -2, z: -2}
   translateLimitsMax: {x: 2, y: 2, z: 2}
-  smoothRotation: 1
-  smoothScale: 1
   scaleLimits: {x: 0.3, y: 3}

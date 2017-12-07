@@ -65,10 +65,6 @@ public class LookAtCamera : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (Time.timeScale < float.Epsilon) {
-			return;
-		}
-
 		if (allowInput) {
 			if (Input.GetButton("Fire1")) {
 				handleRotationInput();

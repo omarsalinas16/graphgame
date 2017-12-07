@@ -12,8 +12,8 @@ public enum PlaneSequenceStatus {
 }
 
 [RequireComponent(typeof(PlayerController))]
-[RequireComponent(typeof(FormBehaviour))]
 public class GameController : MonoBehaviour {
+
 	public static GameController Instance { get; private set; }
 
 	public delegate void OnTryAttemptsChanged(int attempts);
@@ -21,21 +21,6 @@ public class GameController : MonoBehaviour {
 
 	public delegate void OnTransformAttemptsChanged(int attempts);
 	public event OnTransformAttemptsChanged transformAttemptsChangedEvent;
-
-	private FormBehaviour _formBehaviour = null;
-	private FormBehaviour formBehaviour {
-		get {
-			if (_formBehaviour == null) {
-				if (FormBehaviour.Instance != null) {
-					_formBehaviour = FormBehaviour.Instance;
-				} else {
-					_formBehaviour = FindObjectOfType<FormBehaviour>();
-				}
-			}
-
-			return _formBehaviour;
-		}
-	}
 
 	[Header("Requirements")]
 	[SerializeField]
@@ -492,16 +477,16 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void fadeInForm() {
-		if (this.formBehaviour) {
-			this.formBehaviour.fadeIn(activeForm);
+		if (activeForm) {
+			activeForm.GetComponent<FormBehaviour>().fadeIn();
 		}
 	}
 
 	private void endCurrentLevel() {
 		Debug.Log("WIN");
 
-		if (this.formBehaviour) {
-			// this.formBehaviour.fadeOut(activeForm);
+		if (activeForm) {
+			activeForm.GetComponent<FormBehaviour>().fadeOut();
 		}
 	}
 

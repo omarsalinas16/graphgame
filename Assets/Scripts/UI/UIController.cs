@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
+
 	public static UIController Instance { get; private set; }
 
 	private GameController gameController;
@@ -136,15 +137,15 @@ public class UIController : MonoBehaviour {
 		}
 	}
 
-	private float readInputValue(InputField input) {
+	private float readInputValue(InputField input, float defaultValue = 0.0f) {
 		string inputText = input.text;
 		input.text = null;
 
-		return (!string.IsNullOrEmpty(inputText)) ? float.Parse(inputText) : 0.0f;
+		return (!string.IsNullOrEmpty(inputText)) ? float.Parse(inputText) : defaultValue;
 	}
 
 	public void setPosition() {
-		float[] inputValues = positionInputs.Select(readInputValue).ToArray();
+		float[] inputValues = positionInputs.Select(input => readInputValue(input)).ToArray();
 
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (positionChangedEvent != null && inputValues.Length == positionInputs.Length) {
@@ -154,7 +155,7 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void setRotation() {
-		float[] inputValues = rotationInputs.Select(readInputValue).ToArray();
+		float[] inputValues = rotationInputs.Select(input => readInputValue(input)).ToArray();
 
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (rotationChangedEvent != null && inputValues.Length == rotationInputs.Length) {
@@ -164,10 +165,7 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void setScale() {
-		float[] inputValues = scaleInputs.Select(input => {
-			float value = readInputValue(input);
-			return value == 0.0f ? 1.0f : value; 
-		}).ToArray();
+		float[] inputValues = scaleInputs.Select(input => readInputValue(input, 1.0f)).ToArray();
 
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (scalenChangedEvent != null && inputValues.Length == scaleInputs.Length) {

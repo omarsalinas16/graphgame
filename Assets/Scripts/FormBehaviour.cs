@@ -2,7 +2,8 @@
 using DG.Tweening;
 
 public class FormBehaviour : MonoBehaviour {
-	public static FormBehaviour Instance { get; private set; }
+
+	delegate void OnFadeCallback();
 
 	[Header("Fade Settings")]
 	[SerializeField]
@@ -22,30 +23,30 @@ public class FormBehaviour : MonoBehaviour {
 	[SerializeField]
 	private float maxOffsetPosition = -1.0f;
 
+	private Material material;
+
 	private void Awake() {
-		if (Instance != null && Instance != this) {
-			Destroy(gameObject);
-		}
-
-		Instance = this;
+		material = GetComponent<Renderer>().material;
 	}
 
-	public void fadeIn(Transform form) {
-		fade(form, this.minOffsetPosition, this.maxAlpha);
+	public void fadeIn() {
+		fade(this.minOffsetPosition, this.maxAlpha);
 	}
 
-	public void fadeOut(Transform form) {
-		fade(form, this.maxOffsetPosition, this.minAlpha);
+	public void fadeOut() {
+		fade(this.maxOffsetPosition, this.minAlpha, () => Destroy(gameObject));
 	}
 
-	private void fade(Transform form, float offset, float alpha) {
-		Material material = form.GetComponent<Renderer>().material;
-
-		float endOffset = getOffsetY(form.position, offset);
+	private void fade(float offset, float alpha, OnFadeCallback callback = null) {
+		float endOffset = getOffsetY(transform.position, offset);
 		Color endColor = getColorWithAlpha(material.color, alpha);
 
-		form.DOMoveY(endOffset, fadeDuration);
-		material.DOColor(endColor, fadeDuration);
+		transform.DOMoveY(endOffset, fadeDuration);
+		Tweener tween = material.DOColor(endColor, fadeDuration);
+
+		if (callback != null) {
+			tween.OnComplete(() => callback());
+		}
 	}
 
 	private Color getColorWithAlpha(Color color, float alpha) {
