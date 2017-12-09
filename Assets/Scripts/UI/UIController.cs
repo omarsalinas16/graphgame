@@ -60,13 +60,19 @@ public class UIController : MonoBehaviour {
 
 		// Delegates and event suscriptions
 		
-		gameController = GameController.Instance;
+		if (GameController.Instance) {
+			gameController = GameController.Instance;
+		} else {
+			gameController = FindObjectOfType<GameController>();
+		}
 
-		gameController.tryAttemptsChangedEvent += setTryAttemptsLabel;
-		gameController.transformAttemptsChangedEvent += setTransformAttempsLabel;
+		if (gameController) {
+			gameController.tryAttemptsChangedEvent += setTryAttemptsToggles;
+			gameController.transformAttemptsChangedEvent += setTransformAttempsLabel;
+		}
 	}
 
-	public void setTryAttemptsLabel(int amount) {
+	public void setTryAttemptsToggles(int amount) {
 		int i = 0;
 
 		if (tryTogglesParent.childCount < amount) {

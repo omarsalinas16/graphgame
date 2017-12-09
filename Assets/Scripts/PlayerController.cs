@@ -18,50 +18,26 @@ public class PlayerController : MonoBehaviour {
 	private Vector3 translateLimitsMin;
 	[SerializeField]
 	private Vector3 translateLimitsMax;
-
 	private Vector3 targetTranslate;
-	private bool needsToTranslate = false;
 
 	[Header("Rotation")]
+	private Quaternion targetRotation;
 	private float _rotationAngleX = 0.0f;
 	private float rotationAngleX {
-		get {
-			return _rotationAngleX;
-		}
-
-		set {
-			_rotationAngleX = value;
-
-			if (_rotationAngleX < -360.0f || _rotationAngleX > 360.0f) {
-				_rotationAngleX = 0.0f;
-			}
-		}
+		get { return _rotationAngleX; }
+		set { _rotationAngleX = (value + 360.0f) % 360.0f; }
 	}
 
 	private float _rotationAngleY = 0.0f;
 	private float rotationAngleY {
-		get {
-			return _rotationAngleY;
-		}
-
-		set {
-			_rotationAngleY = value;
-
-			if (_rotationAngleY < -360.0f || _rotationAngleY > 360.0f) {
-				_rotationAngleY = 0.0f;
-			}
-		}
+		get { return _rotationAngleY; }
+		set { _rotationAngleY = (value + 360.0f) % 360.0f; }
 	}
-
-	private Quaternion targetRotation;
-	private bool needsToRotate = false;
 
 	[Header("Scale")]
 	[SerializeField]
 	private Vector2 scaleLimits;
-
 	private Vector3 targetScale;
-	private bool needsToScale = false;
 
 	private void Awake() {
 		if (Instance != null && Instance != this) {
@@ -74,29 +50,26 @@ public class PlayerController : MonoBehaviour {
 	private void Start() {
 		// Delegates and event suscriptions
 
-		UIController uiController = UIController.Instance;
+		UIController uiController = null;
 
-		uiController.positionChangedEvent += addTargetTranslate;
-		uiController.rotationChangedEvent += addTargetRotation;
-		uiController.scalenChangedEvent += addTargetScale;
+		if (UIController.Instance) {
+			uiController = UIController.Instance;
+		} else {
+			uiController = FindObjectOfType<UIController>();
+		}
 
-		uiController.resetGameEvent += initTargetTransforms;
-	}
+		if (uiController) {
+			uiController.positionChangedEvent += addTargetTranslate;
+			uiController.rotationChangedEvent += addTargetRotation;
+			uiController.scalenChangedEvent += addTargetScale;
 
-	private void Update() {
-		doTranslate();
-		doRotation();
-		doScaling();
+			uiController.resetGameEvent += initTargetTransforms;
+		}
 	}
 
 	public void setActiveForm(Transform form) {
 		activeForm = form;
-
 		initTargetTransforms();
-
-		needsToTranslate = false;
-		needsToRotate = false;
-		needsToScale = false;
 	}
 
 	public void initTargetTransforms() {
@@ -110,7 +83,9 @@ public class PlayerController : MonoBehaviour {
 		targetTranslate.y = Mathf.Clamp(y, translateLimitsMin.y, translateLimitsMax.y);
 		targetTranslate.z = Mathf.Clamp(z, translateLimitsMin.z, translateLimitsMax.z);
 
-		needsToTranslate = true;
+		if (activeForm) {
+			activeForm.DOLocalMove(targetTranslate, interpolationDuration).SetEase(interpolationEase);
+		}
 	}
 
 	public void addTargetTranslate(float x, float y, float z) {
@@ -121,20 +96,15 @@ public class PlayerController : MonoBehaviour {
 		setTargetTranslate(x, y, z);
 	}
 
-	private void doTranslate() {
-		if (needsToTranslate && activeForm && activeForm.localPosition != targetTranslate) {
-			needsToTranslate = false;
-			activeForm.DOLocalMove(targetTranslate, interpolationDuration).SetEase(interpolationEase);
-		}
-	}
-
 	private void setTargetRotation(float x, float y) {
 		rotationAngleX = x;
 		rotationAngleY = y;
 
 		targetRotation = Quaternion.Euler(rotationAngleX, rotationAngleY, 0.0f);
 
-		needsToRotate = true;
+		if (activeForm) {
+			activeForm.DORotateQuaternion(targetRotation, interpolationDuration).SetEase(interpolationEase);
+		}
 	}
 
 	public void addTargetRotation(float x, float y) {
@@ -144,19 +114,16 @@ public class PlayerController : MonoBehaviour {
 		setTargetRotation(x, y);
 	}
 
-	private void doRotation() {
-		if (needsToRotate && activeForm && activeForm.rotation != targetRotation) {
-			needsToRotate = false;
-			activeForm.DORotateQuaternion(targetRotation, interpolationDuration).SetEase(interpolationEase);
-		}
-	}
-
 	private void setTargetScale(float x, float y, float z) {
 		targetScale.x = Mathf.Clamp(x, scaleLimits.x, scaleLimits.y);
 		targetScale.y = Mathf.Clamp(y, scaleLimits.x, scaleLimits.y);
 		targetScale.z = Mathf.Clamp(z, scaleLimits.x, scaleLimits.y);
 
-		needsToScale = true;
+		if (activeForm) {
+			activeForm.DOScaleX(targetScale.x, interpolationDuration).SetEase(interpolationEase);
+			activeForm.DOScaleY(targetScale.y, interpolationDuration).SetEase(interpolationEase);
+			activeForm.DOScaleZ(targetScale.z, interpolationDuration).SetEase(interpolationEase);
+		}
 	}
 
 	public void addTargetScale(float x, float y, float z) {
@@ -165,14 +132,5 @@ public class PlayerController : MonoBehaviour {
 		z *= targetScale.z;
 
 		setTargetScale(x, y, z);
-	}
-
-	private void doScaling() {
-		if (needsToScale && activeForm && activeForm.localScale != targetScale) {
-			needsToScale = false;
-			activeForm.DOScaleX(targetScale.x, interpolationDuration).SetEase(interpolationEase);
-			activeForm.DOScaleY(targetScale.y, interpolationDuration).SetEase(interpolationEase);
-			activeForm.DOScaleZ(targetScale.z, interpolationDuration).SetEase(interpolationEase);
-		}
 	}
 }

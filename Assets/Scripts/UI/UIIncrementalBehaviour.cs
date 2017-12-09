@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class UIIncrementalBehaviour : MonoBehaviour {
@@ -11,17 +9,10 @@ public class UIIncrementalBehaviour : MonoBehaviour {
 	private float angleIncrement = 45.0f;
 
 	public void changeIncrementalInput(int direction) {
-		float currentAngle = 0.0f;
-
-		if (!string.IsNullOrEmpty(inputField.text)) {
-			currentAngle = float.Parse(inputField.text);
-		}
+		float currentAngle = (!string.IsNullOrEmpty(inputField.text)) ? float.Parse(inputField.text) : 0.0f;
 
 		currentAngle += angleIncrement * direction;
-
-		if (currentAngle > 360 || currentAngle < -360) {
-			currentAngle = 0;
-		}
+		currentAngle = (currentAngle + 360.0f) % 360.0f;
 
 		inputField.text = currentAngle.ToString();
 	}

@@ -15,7 +15,6 @@ public class LookAtCamera : MonoBehaviour {
 	[SerializeField]
 	[Range(1.0f, 10.0f)]
 	private float turnSpeed = 1.0f;
-
 	[SerializeField]
 	private float turnSmoothing = 0.0f;
 	[SerializeField]
@@ -33,8 +32,7 @@ public class LookAtCamera : MonoBehaviour {
 	private float minZoom = 5.0f;
 	[SerializeField]
 	private float maxZoom = 10.0f;
-
-	[Header("Camera Shake")]
+	
 	private float lookAngleX = 0.0f;
 	private float lookAngleY = 0.0f;
 
@@ -50,10 +48,6 @@ public class LookAtCamera : MonoBehaviour {
 	}
 
 	private void Start() {
-		// Delegates and event suscriptions
-
-		UIController.Instance.resetGameEvent += resetCameraPosition;
-
 		if (mainCamera == null) {
 			mainCamera = Camera.main;
 		}
@@ -62,6 +56,20 @@ public class LookAtCamera : MonoBehaviour {
 
 		startAngle = transform.rotation;
 		setTargetRotation(startAngle);
+
+		// Delegates and event suscriptions
+
+		UIController uiController = null;
+
+		if (UIController.Instance) {
+			uiController = UIController.Instance;
+		} else {
+			uiController = FindObjectOfType<UIController>();
+		}
+
+		if (uiController) {
+			uiController.resetGameEvent += resetCameraPosition;
+		}
 	}
 
 	private void Update() {
