@@ -29,7 +29,6 @@ public class GameController : MonoBehaviour {
 	[Header("Points")]
 	[SerializeField]
 	private int maxSolveTryAttempts = 3;
-	[SerializeField]
 	private int _solveTryAttempts;
 	public int solveTryAttempts {
 		get {
@@ -47,7 +46,6 @@ public class GameController : MonoBehaviour {
 
 	[SerializeField]
 	private int maxTransformAttempts = 5;
-	[SerializeField]
 	private int _transformAttempts;
 	public int transformAttempts {
 		get {

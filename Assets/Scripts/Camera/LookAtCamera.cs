@@ -89,16 +89,10 @@ public class LookAtCamera : MonoBehaviour {
 		float yInput = Input.GetAxis("Mouse X") * (invertXAxis ? 1 : -1);
 		
 		lookAngleX += xInput * turnSpeed;
-
-		if (lookAngleX > 360 || lookAngleX < -360) {
-			lookAngleX = 0;
-		}
+		lookAngleX = (lookAngleX + 360.0f) % 360.0f;
 		
 		lookAngleY += yInput * turnSpeed;
-
-		if (lookAngleY > 360 || lookAngleY < -360) {
-			lookAngleY = 0;
-		}
+		lookAngleY = (lookAngleY + 360.0f) % 360.0f;
 
 		setTargetRotation(lookAngleX, lookAngleY, 0f);
 	}
@@ -134,8 +128,10 @@ public class LookAtCamera : MonoBehaviour {
 			return;
 		}
 
-		if (Input.GetAxis("Mouse ScrollWheel") != 0) {
-			transformTargetScroll -= Input.GetAxis("Mouse ScrollWheel") * 1000 * scrollSpeed * Time.deltaTime;
+		float mouseWheelAxis = Input.GetAxis("Mouse ScrollWheel");
+
+		if (mouseWheelAxis != 0) {
+			transformTargetScroll -= mouseWheelAxis * 1000 * scrollSpeed * Time.deltaTime;
 			transformTargetScroll = Mathf.Clamp(transformTargetScroll, minZoom, maxZoom);
 		}
 

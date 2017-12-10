@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -73,37 +74,33 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void setTryAttemptsToggles(int amount) {
-		int i = 0;
+		List<Toggle> toggles = new List<Toggle>();
+		GameObject toggleObject = null;
+		Toggle toggleComponent = null;
 
 		if (tryTogglesParent.childCount < amount) {
 			foreach (Transform child in tryTogglesParent) {
 				DestroyImmediate(child.gameObject);
 			}
 
-			for (i = 0; i < amount; i++) {
-				Instantiate(tryTogglePreset, tryTogglesParent);
+			for (int i = 0; i < amount; i++) {
+				toggleObject = Instantiate(tryTogglePreset, tryTogglesParent);
+				toggleComponent = toggleObject.GetComponent<Toggle>();
+
+				toggles.Add(toggleComponent);
+			}
+		} else {
+			foreach (Transform child in tryTogglesParent) {
+				toggleComponent = child.GetComponent<Toggle>();
+				toggles.Add(toggleComponent);
 			}
 		}
 
-		if (tryTogglesParent.childCount <= 0) {
-			return;
-		}
-
-		Toggle tryToggle;
-
-		for (i = 0; i < tryTogglesParent.childCount; i++) {
-			tryToggle = tryTogglesParent.GetChild(i).GetComponent<Toggle>();
-
-			if (amount > 0) {
-				if (tryToggle) {
-					tryToggle.isOn = true;
-				}
-
-				amount--;
+		foreach (Toggle toggle in toggles) {
+			if (amount-- > 0) {
+				toggle.isOn = true;
 			} else {
-				if (tryToggle) {
-					tryToggle.isOn = false;
-				}
+				toggle.isOn = false;
 			}
 		}
 	}

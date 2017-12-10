@@ -17,10 +17,13 @@ public class GridBehaviour : MonoBehaviour {
 
 	private void Update() {
 		if (Input.GetKeyDown("x")) {
+			AxisXYZ.gridLinesColor = Color.red;
 			setGridAndCameraRotation(90, 0, 0);
 		} else if (Input.GetKeyDown("y")) {
+			AxisXYZ.gridLinesColor = Color.green;
 			setGridAndCameraRotation(0, -90, 0);
 		} else if (Input.GetKeyDown("z")) {
+			AxisXYZ.gridLinesColor = Color.blue;
 			setGridAndCameraRotation(0, 0, 0);
 		}
 
