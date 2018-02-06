@@ -7,12 +7,16 @@ public class GridBehaviour : MonoBehaviour {
 
 	private bool needsToRevert = false;
 
+	private LookAtCamera lookAtCamera;
+
 	private void Start() {
 		if (!lines) {
 			lines = transform.GetChild(0).gameObject;
 		}
 
 		lines.SetActive(false);
+
+		this.lookAtCamera = LookAtCamera.Instance;
 	}
 
 	private void Update() {
@@ -30,9 +34,9 @@ public class GridBehaviour : MonoBehaviour {
 		if (Input.GetKeyUp("x") || Input.GetKeyUp("y") || Input.GetKeyUp("z")) {
 			lines.SetActive(false);
 
-			if (needsToRevert && LookAtCamera.Instance) {
-				LookAtCamera.Instance.setTargetRotation(lastCameraRotation);
-				LookAtCamera.Instance.allowInput = true;
+			if (needsToRevert && this.lookAtCamera) {
+				this.lookAtCamera.setTargetRotation(lastCameraRotation);
+				this.lookAtCamera.allowInput = true;
 
 				needsToRevert = false;
 			}
@@ -44,11 +48,11 @@ public class GridBehaviour : MonoBehaviour {
 
 		lines.transform.rotation = rotation;
 
-		if (LookAtCamera.Instance) {
-			lastCameraRotation = LookAtCamera.Instance.getTargetRotation();
-			LookAtCamera.Instance.setTargetRotation(rotation);
+		if (this.lookAtCamera) {
+			lastCameraRotation = this.lookAtCamera.getTargetRotation();
+			this.lookAtCamera.setTargetRotation(rotation);
 
-			LookAtCamera.Instance.allowInput = false;
+			this.lookAtCamera.allowInput = false;
 		}
 
 		lines.SetActive(true);

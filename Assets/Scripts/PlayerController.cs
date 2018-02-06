@@ -50,13 +50,7 @@ public class PlayerController : MonoBehaviour {
 	private void Start() {
 		// Delegates and event suscriptions
 
-		UIController uiController = null;
-
-		if (UIController.Instance) {
-			uiController = UIController.Instance;
-		} else {
-			uiController = FindObjectOfType<UIController>();
-		}
+		UIController uiController = UIController.Instance;
 
 		if (uiController) {
 			uiController.positionChangedEvent += addTargetTranslate;

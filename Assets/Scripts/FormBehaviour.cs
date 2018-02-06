@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using DG.Tweening;
 
-public class FormBehaviour : MonoBehaviour {
+[System.Serializable]
+public class FormBehaviour {
 
 	delegate void OnFadeCallback();
 
@@ -17,43 +18,62 @@ public class FormBehaviour : MonoBehaviour {
 	[Range(0.0f, 1.0f)]
 	private float maxAlpha = 1.0f;
 
-	[Header("Slide")]
-	[SerializeField]
-	private float minOffsetPosition = 0.0f;
-	[SerializeField]
-	private float maxOffsetPosition = -1.0f;
+	public bool setFormToStart(Transform form, Level level) {
+		if (form && level != null) {
+			form.localPosition = level.startPosition;
+			form.Rotate(level.startRotation);
+			form.localScale = level.startScale;
 
-	private Material material;
+			return true;
+		}
 
-	private void Awake() {
-		material = GetComponent<Renderer>().material;
+		return false;
 	}
 
-	public void fadeIn() {
-		fade(this.minOffsetPosition, this.maxAlpha);
+	public bool setFormToFinal(Transform form, Level level, float scaleOffsetFix) {
+		if (form && level != null) {
+			form.localPosition = level.position;
+			form.Rotate(level.rotation);
+
+			// Temporal scale fix for plane colliders.
+			form.localScale = level.scale + new Vector3(scaleOffsetFix, scaleOffsetFix, scaleOffsetFix);
+
+			return true;
+		}
+
+		return false;
 	}
 
-	public void fadeOut() {
-		fade(this.maxOffsetPosition, this.minAlpha, () => Destroy(gameObject));
+	public bool fadeIn(GameObject form) {
+		return fade(form, this.maxAlpha);
 	}
 
-	private void fade(float offset, float alpha, OnFadeCallback callback = null) {
-		float endOffset = getOffsetY(transform.position, offset);
+	public bool fadeOut(GameObject form, bool destroyOnEnd = true) {
+		if (destroyOnEnd) {
+			return fade(form, this.minAlpha, () => GameObject.Destroy(form));
+		} else {
+			return fade(form, this.minAlpha);
+		}
+	}
+
+	private bool fade(GameObject form, float alpha, OnFadeCallback callback = null) {
+		if (form == null) {
+			return false;
+		}
+
+		Material material = form.GetComponent<Renderer>().material;
 		Color endColor = getColorWithAlpha(material.color, alpha);
-
-		transform.DOMoveY(endOffset, fadeDuration);
+		
 		Tweener tween = material.DOColor(endColor, fadeDuration);
 
 		if (callback != null) {
 			tween.OnComplete(() => callback());
 		}
+
+		return true;
 	}
 
 	private Color getColorWithAlpha(Color color, float alpha) {
 		return new Color(color.r, color.g, color.b, alpha); ;
-	}
-
-	private float getOffsetY(Vector3 position, float offset) {
-		return position.y + offset;
 	}
 }

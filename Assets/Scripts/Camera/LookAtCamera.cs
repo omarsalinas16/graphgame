@@ -59,13 +59,7 @@ public class LookAtCamera : MonoBehaviour {
 
 		// Delegates and event suscriptions
 
-		UIController uiController = null;
-
-		if (UIController.Instance) {
-			uiController = UIController.Instance;
-		} else {
-			uiController = FindObjectOfType<UIController>();
-		}
+		UIController uiController = UIController.Instance;
 
 		if (uiController) {
 			uiController.resetGameEvent += resetCameraPosition;

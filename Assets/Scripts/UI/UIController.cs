@@ -60,12 +60,8 @@ public class UIController : MonoBehaviour {
 		Instance = this;
 
 		// Delegates and event suscriptions
-		
-		if (GameController.Instance) {
-			gameController = GameController.Instance;
-		} else {
-			gameController = FindObjectOfType<GameController>();
-		}
+
+		this.gameController = GameController.Instance;
 
 		if (gameController) {
 			gameController.tryAttemptsChangedEvent += setTryAttemptsToggles;
