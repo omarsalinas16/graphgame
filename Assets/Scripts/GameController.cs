@@ -88,7 +88,7 @@ public class GameController : MonoBehaviour {
 
 	private PlayerController playerController;
 	private LevelController levelController;
-	private UIController uiController;
+	private GameInputController uiController;
 
 	private void Awake() {
 		if (Instance != null && Instance != this) {
@@ -102,7 +102,7 @@ public class GameController : MonoBehaviour {
 		// Delegates and event suscriptions
 		this.levelController = LevelController.Instance;
 		this.playerController = PlayerController.Instance;
-		this.uiController = UIController.Instance;
+		this.uiController = GameInputController.Instance;
 
 		this.uiController.resetGameEvent += resetTransformAttempts;
 

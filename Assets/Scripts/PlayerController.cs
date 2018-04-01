@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviour {
 	private void Start() {
 		// Delegates and event suscriptions
 
-		UIController uiController = UIController.Instance;
+		GameInputController uiController = GameInputController.Instance;
 
 		if (uiController) {
 			uiController.positionChangedEvent += addTargetTranslate;
