@@ -60,9 +60,9 @@ public class GameController : MonoBehaviour {
 
 	[Header("Planes")]
 	[SerializeField]
-	private Transform xPlane;
+	private GameObject xPlane;
 	[SerializeField]
-	private Transform zPlane;
+	private GameObject zPlane;
 
 	[SerializeField]
 	private HoleMaker holeMaker = new HoleMaker();
@@ -123,8 +123,8 @@ public class GameController : MonoBehaviour {
 
 	private void makeBothHoles() {
 		if (this.holeMaker != null) {
-			this.holeMaker.makeHole(xPlane, this.activeForm.gameObject, Vector3.right);
-			this.holeMaker.makeHole(zPlane, this.activeForm.gameObject, Vector3.forward);
+			this.holeMaker.makeHoleWithCopy(xPlane, this.activeForm.gameObject, Vector3.left, deleteAfter : false);
+			this.holeMaker.makeHoleWithCopy(zPlane, this.activeForm.gameObject, Vector3.forward, deleteAfter: false);
 		}
 	}
 
