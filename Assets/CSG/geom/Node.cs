@@ -43,7 +43,6 @@ namespace ConstructiveSolidGeometry
         {
             if (this.polygons.Count == 0)
             {
-                Debug.LogError("No polygons?");
                 return;
             }
 

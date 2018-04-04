@@ -49,8 +49,7 @@ public class PlaneBehaviour : MonoBehaviour {
 	private Vector3 endPosition;
 
 	private void Start() {
-		startPosition = transform.position;
-		endPosition = startPosition + direction * (distanceToMove - planeWidth);
+		updateStartPosition(this.transform.position);
 	}
 
 	private void Update() {
@@ -90,8 +89,17 @@ public class PlaneBehaviour : MonoBehaviour {
 		currentDelayTime = delayDuration;
 	}
 
+	public void updateStartPosition(Vector3 position) {
+		startPosition = position;
+		endPosition = startPosition + direction * (distanceToMove - planeWidth);
+	}
+
 	private void OnTriggerEnter(Collider other) {
+		Debug.Log("trigger");
+
 		if (planeStatus == PlaneStatus.Move && other.CompareTag(formTag)) {
+			Debug.Log("collided");
+
 			planeStatus = PlaneStatus.Return;
 
 			transform.DOKill();
