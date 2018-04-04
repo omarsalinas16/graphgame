@@ -23,12 +23,17 @@ namespace HoleMakerHelpers {
 
 		private void modifyMeshCube() {
 			MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+
 			var collider = gameObject.GetComponent<MeshCollider>();
 			var boxCollider = gameObject.GetComponent<BoxCollider>();
-			boxCollider.enabled = false;
+			GameObject.DestroyImmediate(boxCollider);
+
 			if (!collider) {
 				collider = gameObject.AddComponent<MeshCollider>();
 				collider.sharedMesh = meshFilter.mesh;
+				
+				collider.convex = true;
+				collider.isTrigger = true;
 			}
 		}
 
