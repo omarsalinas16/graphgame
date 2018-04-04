@@ -120,9 +120,9 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void makeBothHoles() {
-		//HoleMaker.HoleMaker holeMaker = new HoleMaker.HoleMaker(this.activeForm.gameObject);
-		//holeMaker.makeXHole(xPlane);
-		//holeMaker.makeZHole(zPlane);
+		HoleMaker.HoleMaker holeMaker = new HoleMaker.HoleMaker(this.activeForm.gameObject);
+		holeMaker.makeXHole(xPlane);
+		holeMaker.makeZHole(zPlane);
 	}
 
 	public bool startPlaneSequence() {
@@ -202,13 +202,7 @@ public class GameController : MonoBehaviour {
 
 		if (currentLevel != null) {
 			activeForm = Instantiate(currentLevel.form, formSpawn.position, Quaternion.identity, formSpawn);
-			// Set the collider
-			MeshFilter meshFilter = activeForm.gameObject.GetComponent<MeshFilter>();
-			var collider = activeForm.gameObject.AddComponent<MeshCollider>();
-			collider.sharedMesh = meshFilter.mesh;				
-			collider.convex = true;
-			collider.isTrigger = true;
-
+			
 			if (this.playerController) {
 				this.playerController.setActiveForm(getActiveForm());
 			}
@@ -216,6 +210,7 @@ public class GameController : MonoBehaviour {
 			if (activeForm != null) {
 				setFormToSolution();
 				makeBothHoles();
+				asignCollider();
 				setFormToStartPosition();
 				fadeInForm();
 			}
@@ -226,6 +221,15 @@ public class GameController : MonoBehaviour {
 			resetSolveTryAttempts();
 			resetTransformAttempts();
 		}
+	}
+
+	private void asignCollider() {
+		// Set the collider
+		MeshFilter meshFilter = activeForm.gameObject.GetComponent<MeshFilter>();
+		var collider = activeForm.gameObject.AddComponent<MeshCollider>();
+		collider.sharedMesh = meshFilter.mesh;				
+		collider.convex = true;
+		collider.isTrigger = true;
 	}
 
 	private void setFormToSolution() {
