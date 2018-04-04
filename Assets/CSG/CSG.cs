@@ -57,7 +57,6 @@ namespace ConstructiveSolidGeometry
     public class CSG
     {
         public List<Polygon> polygons;
-        private Bounds bounds = new Bounds();
 
         /// <summary>
         /// Constuctor
@@ -182,7 +181,6 @@ namespace ConstructiveSolidGeometry
         {
             List<Polygon> triangles = new List<Polygon>();
             int[] tris = m.triangles;
-            Debug.Log("tris " + tris.Length);
             for (int t = 0; t < tris.Length; t += 3)
             {
                 Vertex[] vs = new Vertex[3];
@@ -192,7 +190,6 @@ namespace ConstructiveSolidGeometry
                 //Debug.Log("Tri index: " + (t+i).ToString() + ", Vertex: " + vs[i].pos);
                 triangles.Add(new Polygon(vs));
             }
-            Debug.Log("Poly " + triangles.Count);
             return CSG.fromPolygons(triangles);
         }
 

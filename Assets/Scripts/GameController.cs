@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using HoleMakerL;
+using HoleMaker;
 
 public enum PlaneSequenceStatus {
 	Idle = 0,
@@ -65,9 +65,6 @@ public class GameController : MonoBehaviour {
 	[SerializeField]
 	private GameObject zPlane;
 
-	//[SerializeField]
-	//private HoleMaker holeMaker = new HoleMaker();
-
 	private PlaneBehaviour xPlaneBehaviour;
 	private PlaneBehaviour zPlaneBehaviour;
 	private bool issueMovePlane = false;
@@ -122,8 +119,8 @@ public class GameController : MonoBehaviour {
 		handlePlaneSequence();
 	}
 
-	private void makeBothHoles() {		
-		HoleMaker holeMaker = new HoleMaker(activeForm.gameObject);
+	private void makeBothHoles() {
+		HoleMaker.HoleMaker holeMaker = new HoleMaker.HoleMaker(this.activeForm.gameObject);
 		holeMaker.makeXHole(xPlane);
 		holeMaker.makeZHole(zPlane);
 	}
