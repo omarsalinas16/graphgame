@@ -16,6 +16,7 @@ namespace HoleMakerHelpers {
 		private FACE faceToExtract;
 
 		public ExtractFaces(GameObject gameObject, FACE face) {
+
 			this.gameObject = gameObject;
 			if (face == FACE.X) modifyMeshCube();
 			faceToExtract = face;
@@ -30,10 +31,7 @@ namespace HoleMakerHelpers {
 
 			if (!collider) {
 				collider = gameObject.AddComponent<MeshCollider>();
-				collider.sharedMesh = meshFilter.mesh;
-				
-				collider.convex = true;
-				collider.isTrigger = true;
+				collider.sharedMesh = meshFilter.mesh;				
 			}
 		}
 

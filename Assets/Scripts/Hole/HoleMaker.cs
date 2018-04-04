@@ -10,9 +10,12 @@ namespace HoleMaker {
 		GameObject zDeepObject;
 
 		public HoleMaker(GameObject form) {
-			this.form = form;
-			this.xDeepObject = getXObject();
+			this.form = Object.Instantiate(form);
+			form.SetActive(false);			
+			this.xDeepObject = getXObject();			
 			this.zDeepObject = getZObject();
+			form.SetActive(true);
+			UnityEngine.Object.Destroy(this.form);
 		}
 
 		private GameObject getXObject() {
