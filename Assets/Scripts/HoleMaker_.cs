@@ -2,7 +2,7 @@
 using ConstructiveSolidGeometry;
 
 [System.Serializable]
-public class HoleMaker {
+public class HoleMaker_ {
 
 	[SerializeField]
 	private float extrudeLength = 10f;
