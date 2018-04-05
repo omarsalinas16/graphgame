@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class UIIncrementalBehaviour : MonoBehaviour {
+public class IncrementalInput : MonoBehaviour {
 
 	[SerializeField]
-	private InputField inputField;
+	private TMP_InputField inputField;
 	[SerializeField]
 	private float angleIncrement = 45.0f;
 
@@ -16,4 +17,5 @@ public class UIIncrementalBehaviour : MonoBehaviour {
 
 		inputField.text = currentAngle.ToString();
 	}
+
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class GameInputController : MonoBehaviour {
 
@@ -32,25 +33,25 @@ public class GameInputController : MonoBehaviour {
 
 	[Header("Labels")]
 	[SerializeField]
-	private Text transformAttemptsLabel;
+	private TextMeshProUGUI transformAttempts;
 
 	[Header("Position Fields")]
 	[SerializeField]
 	private Button positionButton;
 	[SerializeField]
-	private InputField[] positionInputs = new InputField[3];
+	private TMP_InputField[] positionInputs = new TMP_InputField[3];
 
 	[Header("Rotation Fields")]
 	[SerializeField]
 	private Button rotateButton;
 	[SerializeField]
-	private InputField[] rotationInputs = new InputField[2];
+	private TMP_InputField[] rotationInputs = new TMP_InputField[2];
 
 	[Header("Scale Fields")]
 	[SerializeField]
 	private Button scaleButton;
 	[SerializeField]
-	private InputField[] scaleInputs = new InputField[3];
+	private TMP_InputField[] scaleInputs = new TMP_InputField[3];
 
 	private void Awake() {
 		if (Instance != null && Instance != this) {
@@ -116,8 +117,8 @@ public class GameInputController : MonoBehaviour {
 	}
 
 	public void setTransformAttempsLabel(int amount) {
-		if (transformAttemptsLabel) {
-			transformAttemptsLabel.text = (amount >= 0 ? amount : 0).ToString();
+		if (transformAttempts) {
+			transformAttempts.text = (amount >= 0 ? amount : 0).ToString();
 		}
 	}
 
@@ -150,7 +151,7 @@ public class GameInputController : MonoBehaviour {
 		}
 	}
 
-	private float readInputValue(InputField input, float defaultValue = 0.0f) {
+	private float readInputValue(TMP_InputField input, float defaultValue = 0.0f) {
 		string inputText = input.text;
 		input.text = null;
 
