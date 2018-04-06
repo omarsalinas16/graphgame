@@ -50,11 +50,32 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void loadMenuScene() {
+		setGamePauseState(false);
+		SceneFader sceneFader = SceneFader.Instance;
+
+		if (sceneFader) {
+			sceneFader.fadeOut(() => doLoadMenuScene());
+		} else {
+			doLoadMenuScene();
+		}
+	}
+
+	private void doLoadMenuScene() {
 		SceneManager.LoadScene(MENU_SCENE_NAME);
-		Debug.Log("Returning to menu...");
 	}
 
 	public void quitGame() {
+		setGamePauseState(false);
+		SceneFader sceneFader = SceneFader.Instance;
+
+		if (sceneFader) {
+			sceneFader.fadeOut(() => doQuitGame());
+		} else {
+			doQuitGame();
+		}
+	}
+
+	private void doQuitGame() {
 		Application.Quit();
 		Debug.Log("Quitting game...");
 	}
