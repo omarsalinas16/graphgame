@@ -3,20 +3,17 @@
 [System.Serializable]
 public class Level {
 
-	public string name = "Level";
-	public Transform form = null;
-
-	[Header("Start state")]
-	public Vector3 startPosition = new Vector3(0, 0, 0);
-	public Vector3 startRotation = new Vector3(0, 0, 0);
-	public Vector3 startScale = new Vector3(1, 1, 1);
-
-	[Header("Solution state")]
-	public Vector3 position = new Vector3(0, 0, 0);
-	public Vector3 rotation = new Vector3(0, 0, 0);
-	public Vector3 scale = new Vector3(1, 1, 1);
-
-	[Header("Level properties")]
-	public int maxSolveAttempts = 1;
-	public int maxTransformations = 1;
+	public string name { get; set; }
+	public Transform form { get; set; }
+	
+	public Vector3 startPosition { get; set; }
+	public Vector3 startRotation { get; set; }
+	public Vector3 startScale { get; set; }
+	
+	public Vector3 position { get; set; }
+	public Vector3 rotation { get; set; }
+	public Vector3 scale { get; set; }
+	
+	public int maxSolveAttempts { get; set; }
+	public int maxTransformations { get; set; }
 }

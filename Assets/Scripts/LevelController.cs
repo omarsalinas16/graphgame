@@ -3,22 +3,14 @@
 public class LevelController : MonoBehaviour {
 
 	public static LevelController Instance { get; private set; }
-
-	[SerializeField]
-	private int _currentLevelIndex = 0;
-	public int currentLevelIndex {
-		get {
-			return _currentLevelIndex;
-		}
-
-		set {
-			int maxIndex = (levels != null && levels.Length > 0) ? levels.Length - 1 : 0;
-			_currentLevelIndex = Mathf.Clamp(value, 0, maxIndex);
-		}
-	}
-
-	[Header("Levels data")]
-	public Level[] levels;
+	
+	public static int currentLevelIndex {
+		get ;
+		set ;
+	}	
+	
+	public Transform cube;	
+	private const string CUBE = "Cube";
 
 	private void Awake() {
 		if (Instance != null && Instance != this) {
@@ -34,16 +26,26 @@ public class LevelController : MonoBehaviour {
 	}
 
 	public Level getCurrentLevel() {
-		if (levels != null && levels.Length > 0 && currentLevelIndex >= 0) {
-			return levels[currentLevelIndex];
-		}
-
-		return null;
-	}
+		Debug.Log("CurrentLevelIndex " + currentLevelIndex);
+		return LevelsBuilder.GetById(currentLevelIndex).ToLevel(this);	
+	}	
 
 	public Level nextLevel() {
 		currentLevelIndex++;
-
 		return getCurrentLevel();
+	}
+	
+	public string[] GetOptionsSelection() {
+		return new string[] {
+			CUBE
+		};
+	}
+
+	public Transform GetTranformWithPrefabName(string prefabName) {
+		switch(prefabName) {
+			case CUBE:
+				return cube;
+		}
+		return cube;
 	}
 }
