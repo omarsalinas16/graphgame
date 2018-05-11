@@ -17,7 +17,7 @@ public class MenuController : MonoBehaviour {
 	public GameObject mainMenuForm;
 	public GameObject levelsForm;
 	public GameObject historyForm;
-	public GameObject createLevelsForm;
+	public GameObject createLevelsForm;	
 
 	Dictionary<Forms, GameObject> formsDictionary = new Dictionary<Forms, GameObject>();
 
@@ -26,11 +26,15 @@ public class MenuController : MonoBehaviour {
 		formsDictionary.Add(Forms.MAINMENU, mainMenuForm);
 		formsDictionary.Add(Forms.LEVELS, levelsForm);		
 		formsDictionary.Add(Forms.HISTORY, historyForm);
-		formsDictionary.Add(Forms.CREATE_LEVELS, createLevelsForm);
+		formsDictionary.Add(Forms.CREATE_LEVELS, createLevelsForm);		
 	}
 
-	public void goToMainMenu(User user) {
-		this.user = user;
+	public void GoToMainMenu(User user) {
+		LevelController.Instance.user = user;		
+		appearForm(Forms.MAINMENU);
+	}
+
+	public void GoToMainMenu() {		
 		appearForm(Forms.MAINMENU);
 	}
 
@@ -49,9 +53,17 @@ public class MenuController : MonoBehaviour {
 		formToAppear.SetActive(true);
 	}
 
+	public void AppearLevels() {
+		appearForm(Forms.LEVELS);
+	}
+
+	public void AppearCreateLevels() {
+		appearForm(Forms.CREATE_LEVELS);
+	}
+
 	void Awake() {
 		fillFormsDictionary();
-		appearForm(Forms.LEVELS);
+		appearForm(Forms.LOGIN);
 	}
 
 

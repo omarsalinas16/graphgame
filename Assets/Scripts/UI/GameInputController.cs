@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Model;
 
 public class GameInputController : MonoBehaviour {
 
@@ -52,6 +53,8 @@ public class GameInputController : MonoBehaviour {
 	private Button scaleButton;
 	[SerializeField]
 	private TMP_InputField[] scaleInputs = new TMP_InputField[3];
+
+	int countTries = 0;
 
 	private void Awake() {
 		if (Instance != null && Instance != this) {
@@ -166,6 +169,8 @@ public class GameInputController : MonoBehaviour {
 				positionChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
 			}
 		}
+
+		saveMovement(inputValues, TypeTransform.POSITION);
 	}
 
 	public void setRotation() {
@@ -176,6 +181,8 @@ public class GameInputController : MonoBehaviour {
 				rotationChangedEvent(inputValues[0], inputValues[1]);
 			}
 		}
+
+		saveMovement(inputValues, TypeTransform.ROTATION);
 	}
 
 	public void setScale() {
@@ -186,6 +193,19 @@ public class GameInputController : MonoBehaviour {
 				scalenChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
 			}
 		}
+
+		saveMovement(inputValues, TypeTransform.SCALE);
+	}
+
+	private void saveMovement(float[] inputValues, TypeTransform typeTransform) {
+		Vector3 movement;
+		if(typeTransform == TypeTransform.ROTATION) {
+			movement = new Vector3(inputValues[0], inputValues[1], 0);
+		} else  {
+			movement = new Vector3(inputValues[0], inputValues[1], inputValues[2]);
+		}
+		MovementInGameDb.Insert(movement, typeTransform, countTries, LevelController.Instance.ActualGame.Id);
+		countTries++;
 	}
 
 	public void resetAll() {

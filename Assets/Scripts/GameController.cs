@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using HoleMaker;
+using Model;
 
 public enum PlaneSequenceStatus {
 	Idle = 0,
@@ -254,7 +255,9 @@ public class GameController : MonoBehaviour {
 		if (this.formBehaviour != null) {
 			this.formBehaviour.fadeOut(this.activeForm.gameObject, false);
 		}
-
+		GamePlayed gamePlayed = LevelController.Instance.ActualGame;
+		gamePlayed.Solved = true;
+		GamePlayedDb.Update(gamePlayed);
 		Debug.Log("WIN");
 	}
 

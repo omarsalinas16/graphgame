@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Model;
 
 public class LevelController : MonoBehaviour {
 
@@ -8,6 +9,10 @@ public class LevelController : MonoBehaviour {
 		get ;
 		set ;
 	}	
+
+	public GamePlayed ActualGame { get; set; }
+
+	public User user {get; set;}
 	
 	public Transform cube;	
 	private const string CUBE = "Cube";
@@ -27,6 +32,12 @@ public class LevelController : MonoBehaviour {
 
 	public Level getCurrentLevel() {
 		Debug.Log("CurrentLevelIndex " + currentLevelIndex);
+		ActualGame = GamePlayedDb.Insert(
+			new GamePlayed {
+				LevelId = currentLevelIndex,
+				Solved = false
+			}
+		);
 		return LevelsBuilder.GetById(currentLevelIndex).ToLevel(this);	
 	}	
 
