@@ -10,7 +10,7 @@ namespace Model {
         public bool Solved { get; set; }         
 
         override public string ToString() {
-            return "Id " + Id + " LevelId: " + LevelId + " Solved: " + Solved;
+            return "Id: " + Id + " UserId: " + UserId + " LevelId: " + LevelId + " Solved: " + Solved;
         }
     }
 }

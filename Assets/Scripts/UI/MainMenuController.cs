@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
-
+using Model;
 public class MainMenuController : MonoBehaviour {
 
 	[SerializeField]
@@ -12,6 +12,13 @@ public class MainMenuController : MonoBehaviour {
 
 	[SerializeField]
 	private TMP_Text userName;
+
+	public void Start() {
+		User user = LevelController.Instance.user;
+		if(user != null) {
+			SetUser(user);
+		}
+	}
 
 	public void loadMainScene() {
 		SceneFader sceneFader = SceneFader.Instance;
@@ -40,5 +47,29 @@ public class MainMenuController : MonoBehaviour {
 	private void doQuitGame() {
 		Application.Quit();
 		Debug.Log("Quitting game...");
+	}
+
+	public void SetUser(User user) {
+		userName.text = user.Username;
+	}
+
+	public void Logout() {
+		GameObject parentUI = transform.parent.gameObject;
+		MenuController menuControllerScript = parentUI.GetComponent<MenuController>();			
+		menuControllerScript.Logout();
+	}
+
+	public void AppearLevels() {
+		Appear(MenuController.Forms.LEVELS);
+	}
+
+	public void AppearCreateLevels() {
+		Appear(MenuController.Forms.CREATE_LEVELS);
+	}
+
+	private void Appear(MenuController.Forms form) {
+		GameObject parentUI = transform.parent.gameObject;
+		MenuController menuControllerScript = parentUI.GetComponent<MenuController>();			
+		menuControllerScript.appearForm(form);
 	}
 }

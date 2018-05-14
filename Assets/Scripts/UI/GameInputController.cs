@@ -14,7 +14,7 @@ public class GameInputController : MonoBehaviour {
 	public delegate void OnPositionChanged(float x, float y, float z);
 	public event OnPositionChanged positionChangedEvent;
 
-	public delegate void OnRotationChanged(float x, float y);
+	public delegate void OnRotationChanged(float x, float y, float z);
 	public event OnRotationChanged rotationChangedEvent;
 
 	public delegate void OnScaleChanged(float x, float y, float z);
@@ -46,7 +46,7 @@ public class GameInputController : MonoBehaviour {
 	[SerializeField]
 	private Button rotateButton;
 	[SerializeField]
-	private TMP_InputField[] rotationInputs = new TMP_InputField[2];
+	private TMP_InputField[] rotationInputs = new TMP_InputField[3];
 
 	[Header("Scale Fields")]
 	[SerializeField]
@@ -167,10 +167,9 @@ public class GameInputController : MonoBehaviour {
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (positionChangedEvent != null && inputValues.Length == positionInputs.Length) {
 				positionChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
+				saveMovement(inputValues, TypeTransform.POSITION);
 			}
 		}
-
-		saveMovement(inputValues, TypeTransform.POSITION);
 	}
 
 	public void setRotation() {
@@ -178,11 +177,15 @@ public class GameInputController : MonoBehaviour {
 
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (rotationChangedEvent != null && inputValues.Length == rotationInputs.Length) {
-				rotationChangedEvent(inputValues[0], inputValues[1]);
+				for(int i = 0; i < inputValues.Length; i++) {
+					Debug.Log("Input values "+i+": " + inputValues[i]);
+				}				
+				rotationChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
+				saveMovement(inputValues, TypeTransform.ROTATION);
 			}
 		}
 
-		saveMovement(inputValues, TypeTransform.ROTATION);
+		
 	}
 
 	public void setScale() {
@@ -191,19 +194,17 @@ public class GameInputController : MonoBehaviour {
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (scalenChangedEvent != null && inputValues.Length == scaleInputs.Length) {
 				scalenChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
+				saveMovement(inputValues, TypeTransform.SCALE);
 			}
 		}
 
-		saveMovement(inputValues, TypeTransform.SCALE);
+		
 	}
 
 	private void saveMovement(float[] inputValues, TypeTransform typeTransform) {
 		Vector3 movement;
-		if(typeTransform == TypeTransform.ROTATION) {
-			movement = new Vector3(inputValues[0], inputValues[1], 0);
-		} else  {
-			movement = new Vector3(inputValues[0], inputValues[1], inputValues[2]);
-		}
+		
+		movement = new Vector3(inputValues[0], inputValues[1], inputValues[2]);
 		MovementInGameDb.Insert(movement, typeTransform, countTries, LevelController.Instance.ActualGame.Id);
 		countTries++;
 	}

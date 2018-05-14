@@ -24,10 +24,17 @@ public class LevelController : MonoBehaviour {
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
 		}
+
 	}
 
 	private void Start() {
 		// Read from an XML and set the levels array here?
+		if(user == null) {
+			user = new User {
+				Username = "Lalito", Password = "Lalito"				
+			};
+			currentLevelIndex = 1;
+		}
 	}
 
 	public Level getCurrentLevel() {

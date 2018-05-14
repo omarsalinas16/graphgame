@@ -10,5 +10,9 @@ namespace Model {
 
 		public string Password { get; set; }
 
+		override public string ToString() {
+			return " Username: " + Username + " Password: " + Password;
+		}
+
 	}
 }

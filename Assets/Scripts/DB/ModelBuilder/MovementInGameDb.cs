@@ -28,10 +28,10 @@ public class MovementInGameDb  {
         var ds = new DataService();                         
         ds._connection.Insert(movementInGame);  
 
-        List<MovementInGame> moevementInGameAll = GetAll();
+        /* List<MovementInGame> moevementInGameAll = GetAll();
 		foreach(MovementInGame m in moevementInGameAll) {
 			Debug.Log(m.ToString());
-		}   
+        }   */
 
         return movementInGame;   
     }

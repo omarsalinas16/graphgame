@@ -44,7 +44,9 @@ public class LevelsController : MonoBehaviour {
 	private static string MAIN_SCENE_NAME = "Main";
 
 	void Start() {
-		addDinamicallyButtons();
+		canvas = transform.parent.gameObject;
+		menuController = transform.parent.gameObject;
+		addDinamicallyButtons();		
 	}
 
 	public void leave() {
@@ -116,7 +118,14 @@ public class LevelsController : MonoBehaviour {
 			for(int py = 0; py < numberButtonsY ; py++) {			
 				bool getOut = false;			
 				for(int px = 0; px < numberButtonsX ; px++) {								
-					var buttonLevelInst = Instantiate(buttonLevel, menuTemp.transform, false);					
+					try {
+						var level = levels[countOfButtons];
+					} catch(ArgumentOutOfRangeException e) {
+						getOut = true;
+						break;
+					}
+					var buttonLevelInst = Instantiate(buttonLevel, menuTemp.transform, false);		
+
 					buttonLevelInst.GetComponentInChildren<TextMeshProUGUI>().text = levels[countOfButtons].Name;
 					//buttonLevelInst.GetComponentInChildren<Text>().text = "L " + (countOfButtons + 1);
 					buttonLevelInst.gameObject.name = "ButtonLevel" + countOfButtons;								

@@ -94,4 +94,10 @@ public class CreateLevelsController : MonoBehaviour {
 		);
 		
 	}
+
+	public void leave() {
+		GameObject menuController = transform.parent.gameObject;
+		MenuController menuControllerScript = menuController.GetComponent<MenuController>();
+		menuControllerScript.appearForm(MenuController.Forms.MAINMENU);
+	}
 }

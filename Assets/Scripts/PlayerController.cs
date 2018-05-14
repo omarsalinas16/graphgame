@@ -34,6 +34,12 @@ public class PlayerController : MonoBehaviour {
 		set { _rotationAngleY = (value + 360.0f) % 360.0f; }
 	}
 
+	private float _rotationAngleZ = 0.0f;
+	private float rotationAngleZ {
+		get { return _rotationAngleY; }
+		set { _rotationAngleY = (value + 360.0f) % 360.0f; }
+	}
+
 	[Header("Scale")]
 	[SerializeField]
 	private Vector2 scaleLimits;
@@ -68,7 +74,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void initTargetTransforms() {
 		setTargetTranslate(0.0f, 0.0f, 0.0f);
-		setTargetRotation(0.0f, 0.0f);
+		setTargetRotation(0.0f, 0.0f, 0.0f);
 		setTargetScale(1.0f, 1.0f, 1.0f);
 	}
 
@@ -90,22 +96,22 @@ public class PlayerController : MonoBehaviour {
 		setTargetTranslate(x, y, z);
 	}
 
-	private void setTargetRotation(float x, float y) {
-		rotationAngleX = x;
-		rotationAngleY = y;
+	private void setTargetRotation(float x, float y, float z) {		
 
-		targetRotation = Quaternion.Euler(rotationAngleX, rotationAngleY, 0.0f);
+		Vector3 currentRotation = new Vector3(activeForm.eulerAngles.x, activeForm.eulerAngles.y, activeForm.eulerAngles.z); 
+		Vector3 targetRotation = new Vector3(x, y, z);
 
 		if (activeForm) {
-			activeForm.DORotateQuaternion(targetRotation, interpolationDuration).SetEase(interpolationEase);
+			Vector3 finalRotation = currentRotation + targetRotation;
+						
+			activeForm.DORotate(finalRotation, interpolationDuration, RotateMode.FastBeyond360).SetEase(interpolationEase);
+			
 		}
 	}
 
-	public void addTargetRotation(float x, float y) {
-		x += rotationAngleX;
-		y += rotationAngleY;
+	public void addTargetRotation(float x, float y, float z) {		
 
-		setTargetRotation(x, y);
+		setTargetRotation(x, y, z);
 	}
 
 	private void setTargetScale(float x, float y, float z) {

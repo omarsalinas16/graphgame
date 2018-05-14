@@ -9,7 +9,7 @@ public class LoginController : MonoBehaviour {
 
 	public InputField inputUsername;
 	public InputField inputPassword;
-	public GameObject menuController;
+	//public GameObject menuController;
 
 	public void Login() {
 		string username = inputUsername.text;
@@ -23,9 +23,13 @@ public class LoginController : MonoBehaviour {
 		if(user == null) {			
 			UserDb.Insert(user);
 		} else {						
-			MenuController menuControllerScript = menuController.GetComponent<MenuController>();			
+			GameObject parentUI = transform.parent.gameObject;
+			MenuController menuControllerScript = parentUI.GetComponent<MenuController>();			
 			menuControllerScript.GoToMainMenu(user);
 		}
+		inputUsername.text = "";
+		inputPassword.text = "";
+		//UserDb.Insert( new User {Username = username, Password = password});
 	}
 	
 	

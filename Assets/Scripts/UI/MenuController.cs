@@ -32,34 +32,26 @@ public class MenuController : MonoBehaviour {
 	public void GoToMainMenu(User user) {
 		LevelController.Instance.user = user;		
 		appearForm(Forms.MAINMENU);
+		currentForm.GetComponent<MainMenuController>().SetUser(user);
+	}
+
+	public void Logout() {
+		LevelController.Instance.user = null;
+		appearForm(Forms.LOGIN);		
 	}
 
 	public void GoToMainMenu() {		
 		appearForm(Forms.MAINMENU);
-	}
-
-	public void logout() {
-		this.user = null;
-		appearForm(Forms.LOGIN);
-	}
+	}	
 
 	public void appearForm(Forms f) {
 		if(currentForm != null) {
-			currentForm.SetActive(false);
+			Destroy(currentForm);
 		}
 		GameObject formToAppear;
-		formsDictionary.TryGetValue(f, out formToAppear);
-		currentForm = formToAppear;
-		formToAppear.SetActive(true);
-	}
-
-	public void AppearLevels() {
-		appearForm(Forms.LEVELS);
-	}
-
-	public void AppearCreateLevels() {
-		appearForm(Forms.CREATE_LEVELS);
-	}
+		formsDictionary.TryGetValue(f, out formToAppear);		
+		currentForm = Instantiate(formToAppear, transform);		
+	}	
 
 	void Awake() {
 		fillFormsDictionary();
