@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
-using Model;
+using ModelFire;
 public class MainMenuController : MonoBehaviour {
 
 	[SerializeField]
@@ -50,7 +50,7 @@ public class MainMenuController : MonoBehaviour {
 	}
 
 	public void SetUser(User user) {
-		userName.text = user.Username;
+		userName.text = user.username;
 	}
 
 	public void Logout() {

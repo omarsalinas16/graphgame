@@ -504,7 +504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7bb322d0510b2248ada7acd2a79a1be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loginForm: {fileID: 1253324087545234, guid: 257bd41c54cc20940872b6ea58b288d8, type: 2}
+  loginForm: {fileID: 1787326367650148, guid: e11dd8a25f86cf742b4d2d87765c09af, type: 2}
   mainMenuForm: {fileID: 1554161324508632, guid: 7e532a85cf856414385db517abc9bf54,
     type: 2}
   levelsForm: {fileID: 1595337526724404, guid: 722d0fd4f4fda074f9d3c5448258bfd3, type: 2}

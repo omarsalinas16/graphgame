@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using ModelFire;
 using Model;
 
 public class LevelController : MonoBehaviour {
@@ -12,7 +13,7 @@ public class LevelController : MonoBehaviour {
 
 	public GamePlayed ActualGame { get; set; }
 
-	public User user {get; set;}
+	public ModelFire.User user { get; set; }
 	
 	public Transform cube;	
 	private const string CUBE = "Cube";
@@ -30,8 +31,8 @@ public class LevelController : MonoBehaviour {
 	private void Start() {
 		// Read from an XML and set the levels array here?
 		if(user == null) {
-			user = new User {
-				Username = "Lalito", Password = "Lalito"				
+			user = new ModelFire.User {
+				username = "Lalito", email = "Lalito", uid = "1"				
 			};
 			currentLevelIndex = 1;
 		}

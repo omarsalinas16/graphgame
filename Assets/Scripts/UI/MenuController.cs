@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Model;
+using ModelFire;
 
 public class MenuController : MonoBehaviour {	
 

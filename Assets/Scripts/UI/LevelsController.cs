@@ -7,6 +7,9 @@ using System;
 using TMPro;
 using Model;
 using UnityEngine.SceneManagement;
+using SimpleFirebaseUnity;
+using SimpleFirebaseUnity.MiniJSON;
+
 public class LevelsController : MonoBehaviour {
 
 
@@ -46,7 +49,26 @@ public class LevelsController : MonoBehaviour {
 	void Start() {
 		canvas = transform.parent.gameObject;
 		menuController = transform.parent.gameObject;
-		addDinamicallyButtons();		
+		addDinamicallyButtons();
+        DbFire dbFire = new DbFire();
+        dbFire.GetLevels(
+            delegate(Firebase sender, DataSnapshot snapshot) {
+                Dictionary<string, object> dict = snapshot.Value<Dictionary<string, object>>();
+                List<string> keys = snapshot.Keys;
+
+                if (keys != null)
+                {
+                    foreach (string key in keys)
+                    {
+                        Debug.Log(key + " = " + Json.Serialize(dict[key]));
+                    }
+                }
+            },
+            delegate (Firebase sender, FirebaseError error)
+            {
+                Debug.Log(error.Message);
+            }
+        );
 	}
 
 	public void leave() {

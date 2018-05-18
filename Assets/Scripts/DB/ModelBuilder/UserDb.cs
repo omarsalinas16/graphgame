@@ -9,6 +9,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using DatabaseL;
+using SimpleFirebaseUnity;
+using SimpleFirebaseUnity.MiniJSON;
 
 public class UserDb  {
 
@@ -43,5 +45,7 @@ public class UserDb  {
         if(user == null) return null;  
         return (String.Compare(user.Password, p) == 0) ? user : null;
 	}    
+
+
 
 }

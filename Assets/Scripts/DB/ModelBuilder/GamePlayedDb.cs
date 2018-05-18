@@ -15,8 +15,8 @@ public class GamePlayedDb  {
     /// It will return false in case the user already exists
     public static GamePlayed Insert(GamePlayed gamePlayed) {        
         var ds = new DataService();                 
-        
-        gamePlayed.UserId = LevelController.Instance.user.Id;
+        // This is going to be deprecated by 5 am
+        //gamePlayed.UserId = LevelController.Instance.user.Id;
         ds._connection.Insert(gamePlayed);
 
         List<GamePlayed> gamesPlayedAll = GetAll();
