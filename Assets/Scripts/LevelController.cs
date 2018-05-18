@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using ModelFire;
 using Model;
+using Assets.Scripts.DB.Firebase.ModelFire;
 
 public class LevelController : MonoBehaviour {
 
@@ -9,9 +10,15 @@ public class LevelController : MonoBehaviour {
 	public static int currentLevelIndex {
 		get ;
 		set ;
-	}	
+	}
 
-	public GamePlayed ActualGame { get; set; }
+    public static LevelFire currentLevel
+    {
+        get;
+        set;
+    }
+
+    public GamePlayed ActualGame { get; set; }
 
 	public ModelFire.User user { get; set; }
 	
@@ -46,7 +53,8 @@ public class LevelController : MonoBehaviour {
 				Solved = false
 			}
 		);
-		return LevelsBuilder.GetById(currentLevelIndex).ToLevel(this);	
+        //return LevelsBuilder.GetById(currentLevelIndex).ToLevel(this);	
+        return currentLevel.ToLevel(this);
 	}	
 
 	public Level nextLevel() {

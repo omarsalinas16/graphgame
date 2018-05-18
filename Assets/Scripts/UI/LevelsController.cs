@@ -9,6 +9,7 @@ using Model;
 using UnityEngine.SceneManagement;
 using SimpleFirebaseUnity;
 using SimpleFirebaseUnity.MiniJSON;
+using Assets.Scripts.DB.Firebase.ModelFire;
 
 public class LevelsController : MonoBehaviour {
 
@@ -49,20 +50,24 @@ public class LevelsController : MonoBehaviour {
 	void Start() {
 		canvas = transform.parent.gameObject;
 		menuController = transform.parent.gameObject;
-		addDinamicallyButtons();
+		
         DbFire dbFire = new DbFire();
         dbFire.GetLevels(
             delegate(Firebase sender, DataSnapshot snapshot) {
                 Dictionary<string, object> dict = snapshot.Value<Dictionary<string, object>>();
-                List<string> keys = snapshot.Keys;
+                List<string> levels = snapshot.Keys;
+                List<LevelFire> levelsFire = new List<LevelFire>();
 
-                if (keys != null)
+                if (levels != null)
                 {
-                    foreach (string key in keys)
+                    foreach (string level in levels)
                     {
-                        Debug.Log(key + " = " + Json.Serialize(dict[key]));
+                        Debug.Log(level + " = " + Json.Serialize(dict[level]));
+                        LevelFire levelFire = new LevelFire(Json.Serialize(dict[level]), level);
+                        levelsFire.Add(levelFire);
                     }
                 }
+                addDinamicallyButtons(levelsFire);
             },
             delegate (Firebase sender, FirebaseError error)
             {
@@ -76,7 +81,7 @@ public class LevelsController : MonoBehaviour {
 		menuControllerScript.appearForm(MenuController.Forms.MAINMENU);
 	}
 
-	public void addDinamicallyButtons() {
+	public void addDinamicallyButtons(List<LevelFire> levels) {
 		RectTransform rectTransform = canvas.GetComponent<RectTransform>();
 		float canvas_width = rectTransform.rect.width;
 		float canvas_height = rectTransform.rect.height;
@@ -131,7 +136,7 @@ public class LevelsController : MonoBehaviour {
 		int countOfButtons = 0;
 
 		// Getting the levels
-		List<LevelLocal> levels = LevelsBuilder.GetAll();
+		//List<LevelLocal> levels = LevelsBuilder.GetAll();
 		menus = new List<GameObject>();		
 		do {
 			GameObject menuTemp = new GameObject();
@@ -154,7 +159,7 @@ public class LevelsController : MonoBehaviour {
 					RectTransform buttonRect = buttonLevelInst.GetComponent<RectTransform>();
 					buttonRect.localPosition = new Vector3(positionsX[px],positionsY[py],0);				
 					buttonRect.sizeDelta = new Vector2(widthButtons, heightButtons);				
-					Debug.Log("Id del nivel " + levels[countOfButtons].Id);
+					//Debug.Log("Id del nivel " + levels[countOfButtons].Id);
 					int c = countOfButtons;
 					buttonLevelInst.gameObject.GetComponent<Button>().onClick.AddListener(delegate {						
 						AppearNewScene(levels[c]);																		
@@ -179,9 +184,10 @@ public class LevelsController : MonoBehaviour {
 		}
 	}
 
-	private void AppearNewScene(LevelLocal level) {
-		LevelController.currentLevelIndex = level.Id;
-		SceneManager.LoadScene(MAIN_SCENE_NAME);																		
+	private void AppearNewScene(LevelFire level) {
+		LevelController.currentLevelIndex = 1;
+        LevelController.currentLevel = level;
+        SceneManager.LoadScene(MAIN_SCENE_NAME);																		
 	}
 
 	public void GoRigth() {	
