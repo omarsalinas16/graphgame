@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Model;
 
 public class GameInputController : MonoBehaviour {
 
@@ -56,8 +55,14 @@ public class GameInputController : MonoBehaviour {
 
 	int countTries = 0;
 
-	private void Awake() {
-		if (Instance != null && Instance != this) {
+    int maxSolveAttempts = 0;
+    int maxTransformations = 0;
+
+    public GameObject gameObjectController;
+
+
+    private void Awake() {
+        /*if (Instance != null && Instance != this) {
 			Destroy(gameObject);
 		}
 
@@ -65,13 +70,22 @@ public class GameInputController : MonoBehaviour {
 
 		// Delegates and event suscriptions
 
-		this.gameController = GameController.Instance;
+		this.gameController = GameController.Instance;*/
 
-		if (gameController) {
+        Instance = this;
+
+        this.gameController = gameObjectController.GetComponent<GameController>();
+
+        if (gameController) {
 			gameController.tryAttemptsChangedEvent += setTryAttemptsToggles;
 			gameController.transformAttemptsChangedEvent += setTransformAttempsLabel;
 		}
-	}
+
+        maxSolveAttempts = LevelController.Instance.getCurrentLevel().maxSolveAttempts;
+        maxTransformations = LevelController.Instance.getCurrentLevel().maxTransformations;
+        //setTryAttemptsToggles(LevelController.Instance.getCurrentLevel().maxSolveAttempts);
+        //setTransformAttempsLabel(LevelController.Instance.getCurrentLevel().maxTransformations);        
+    }
 
 	private void Update() {
 		if (Input.GetKeyDown(KeyCode.T)) {
@@ -167,7 +181,7 @@ public class GameInputController : MonoBehaviour {
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (positionChangedEvent != null && inputValues.Length == positionInputs.Length) {
 				positionChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
-				saveMovement(inputValues, TypeTransform.POSITION);
+				//saveMovement(inputValues, TypeTransform.POSITION);
 			}
 		}
 	}
@@ -181,7 +195,7 @@ public class GameInputController : MonoBehaviour {
 					Debug.Log("Input values "+i+": " + inputValues[i]);
 				}				
 				rotationChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
-				saveMovement(inputValues, TypeTransform.ROTATION);
+				//saveMovement(inputValues, TypeTransform.ROTATION);
 			}
 		}
 
@@ -194,20 +208,20 @@ public class GameInputController : MonoBehaviour {
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (scalenChangedEvent != null && inputValues.Length == scaleInputs.Length) {
 				scalenChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
-				saveMovement(inputValues, TypeTransform.SCALE);
+				//saveMovement(inputValues, TypeTransform.SCALE);
 			}
 		}
 
 		
 	}
 
-	private void saveMovement(float[] inputValues, TypeTransform typeTransform) {
+	/*private void saveMovement(float[] inputValues, TypeTransform typeTransform) {
 		Vector3 movement;
 		
 		movement = new Vector3(inputValues[0], inputValues[1], inputValues[2]);
 		MovementInGameDb.Insert(movement, typeTransform, countTries, LevelController.Instance.ActualGame.Id);
 		countTries++;
-	}
+	}*/
 
 	public void resetAll() {
 		if (resetGameEvent != null) {

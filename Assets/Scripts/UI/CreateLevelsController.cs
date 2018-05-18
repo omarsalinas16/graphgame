@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Model;
 using System;
 using TMPro;
 using System.Linq;
@@ -42,13 +41,14 @@ public class CreateLevelsController : MonoBehaviour {
 
 	public void CreateLevel() {
 		// TODO: appear a dialog where it says it was succesfull or not
-		LevelsBuilder.Insert(GetLevel());
+		/*LevelsBuilder.Insert(GetLevel());
 		List<LevelLocal> levelLocals = LevelsBuilder.GetAll();
 		foreach(LevelLocal l in levelLocals) {
 			Debug.Log(l.ToString());
-		}
+		}*/
 	}
 
+    /*
 	LevelLocal GetLevel() {
 		string startPos = inputStartPos.text;
 		string startRot = inputStartRot.text;
@@ -99,5 +99,5 @@ public class CreateLevelsController : MonoBehaviour {
 		GameObject menuController = transform.parent.gameObject;
 		MenuController menuControllerScript = menuController.GetComponent<MenuController>();
 		menuControllerScript.appearForm(MenuController.Forms.MAINMENU);
-	}
+	}*/
 }

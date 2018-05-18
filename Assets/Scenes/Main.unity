@@ -177,6 +177,11 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 51282710}
+--- !u!1 &60157840 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1003071026558622, guid: 7d32504be04d5e24ab063278b8c8d062,
+    type: 2}
+  m_PrefabInternal: {fileID: 343195114}
 --- !u!1001 &68635099
 Prefab:
   m_ObjectHideFlags: 0
@@ -2809,6 +2814,7 @@ MonoBehaviour:
   - {fileID: 1945085903}
   - {fileID: 880356003}
   - {fileID: 469352662}
+  gameObjectController: {fileID: 60157840}
 --- !u!114 &862544177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3632,7 +3638,7 @@ Prefab:
     - target: {fileID: 224561124934955664, guid: f85750177740d134f8b456f90be0f133,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -10
+      value: -26.54
       objectReference: {fileID: 0}
     - target: {fileID: 224561124934955664, guid: f85750177740d134f8b456f90be0f133,
         type: 2}
@@ -3642,7 +3648,7 @@ Prefab:
     - target: {fileID: 224561124934955664, guid: f85750177740d134f8b456f90be0f133,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 33.08
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224561124934955664, guid: f85750177740d134f8b456f90be0f133,
         type: 2}

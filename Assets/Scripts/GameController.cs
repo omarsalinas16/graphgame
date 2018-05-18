@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using HoleMaker;
-using Model;
 
 public enum PlaneSequenceStatus {
 	Idle = 0,
@@ -35,7 +34,8 @@ public class GameController : MonoBehaviour {
 		}
 
 		set {
-			_solveTryAttempts = Mathf.Clamp(value, 0, maxSolveTryAttempts);
+            //_solveTryAttempts = Mathf.Clamp(value, 0, maxSolveTryAttempts);
+            _solveTryAttempts = value;
 
 			if (tryAttemptsChangedEvent != null) {
 				tryAttemptsChangedEvent(_solveTryAttempts);
@@ -52,9 +52,9 @@ public class GameController : MonoBehaviour {
 		}
 
 		set {
-			_transformAttempts = Mathf.Clamp(value, 0, maxTransformAttempts);
-
-			if (transformAttemptsChangedEvent != null) {
+            //_transformAttempts = Mathf.Clamp(value, 0, maxTransformAttempts);
+            _transformAttempts = value;
+            if (transformAttemptsChangedEvent != null) {
 				transformAttemptsChangedEvent(_transformAttempts);
 			}
 		}
@@ -255,9 +255,9 @@ public class GameController : MonoBehaviour {
 		if (this.formBehaviour != null) {
 			this.formBehaviour.fadeOut(this.activeForm.gameObject, false);
 		}
-		GamePlayed gamePlayed = LevelController.Instance.ActualGame;
+		/*GamePlayed gamePlayed = LevelController.Instance.ActualGame;
 		gamePlayed.Solved = true;
-		GamePlayedDb.Update(gamePlayed);
+		GamePlayedDb.Update(gamePlayed);*/
 		Debug.Log("WIN");
 	}
 

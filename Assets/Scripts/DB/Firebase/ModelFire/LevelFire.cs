@@ -24,7 +24,7 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
         public LevelFire(string levelJSON, string name)
         {
             this.Name = name;
-            var level = Json.Deserialize(levelJSON) as Dictionary<string, object>;            
+            var level = Json.Deserialize(levelJSON) as Dictionary<string, object>;
             MaxSolveAttemps = (int)((Int64)level["max_attemps"]);
             MaxTransformations = (int)((Int64)level["max_transformations"]);            
             StartState = Json.Serialize(level["start_state"]);

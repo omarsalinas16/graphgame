@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using System.Linq;
 using System;
 using TMPro;
-using Model;
 using UnityEngine.SceneManagement;
 using SimpleFirebaseUnity;
 using SimpleFirebaseUnity.MiniJSON;
