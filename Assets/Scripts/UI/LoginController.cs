@@ -31,7 +31,17 @@ public class LoginController : MonoBehaviour {
                 Debug.Log(uid);
                 GameObject parentUI = transform.parent.gameObject;
                 MenuController menuControllerScript = parentUI.GetComponent<MenuController>();
-                menuControllerScript.GoToMainMenu(new User { email = email, uid = uid, username = "sebas"});
+                dbFire.GetUserFire(
+                    delegate (UserFire u)
+                    {
+                        menuControllerScript.GoToMainMenu(u);
+                    },
+                    delegate (Firebase sender, FirebaseError error)
+                    {
+                        Debug.Log(error.Message);
+                    }, uid
+                );
+                
             },
             delegate(string error) {
                 Debug.Log(error);

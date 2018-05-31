@@ -8,7 +8,7 @@ using System.Collections;
 using System;
 
 using UnityEngine.Networking;
-
+using ModelFire;
 
 public class DbFire
 {
@@ -89,10 +89,36 @@ public class DbFire
         else
         {
             Debug.Log(www.text);
-            var user = JsonUtility.FromJson<UserSiginResponse>(www.text);
-            onSuccess(user.localId);
+            var response = Json.Deserialize(www.text) as Dictionary<string, object>;
+            var uid = (string)response["localId"];            
+            onSuccess(uid);
         }
+    }    
+
+    public void GetUserFire(Action<UserFire> onSuccess, Action<Firebase, FirebaseError> onFail, string uid)
+    {
+        firebase.OnGetSuccess += delegate (Firebase sender, DataSnapshot snapshot) {
+            string username = onUserObtained(sender, snapshot);
+            onSuccess(new UserFire { username = username, uid = uid });
+        };
+        firebase.OnGetFailed += onFail;
+        firebase.Child("users/" + uid, true).GetValue();
     }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="snapshot"></param>
+    /// <returns>The username</returns>
+    public string onUserObtained(Firebase sender, DataSnapshot snapshot)
+    {
+        Dictionary<string, object> dict = snapshot.Value<Dictionary<string, object>>();
+        string username = (string)dict["username"];
+        return username;
+    }
+
 
     public class UserSiginResponse {
         public string kind { get; set; }

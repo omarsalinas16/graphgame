@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 224700366389036078}
   - component: {fileID: 114631257376384712}
   m_Layer: 5
-  m_Name: Login
+  m_Name: Login2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -779,6 +779,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputUsername: {fileID: 114045866014972436}
   inputPassword: {fileID: 114874163117559048}
+  error: {fileID: 0}
 --- !u!114 &114643369414271736
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1770,8 +1771,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 855, y: 433}
+  m_AnchoredPosition: {x: 0, y: -58.25}
+  m_SizeDelta: {x: 855, y: 316.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224940381296456368
 RectTransform:

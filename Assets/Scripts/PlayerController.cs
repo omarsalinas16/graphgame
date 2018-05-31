@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void setActiveForm(Transform form) {
 		activeForm = form;
-		initTargetTransforms();
+		//initTargetTransforms();
 	}
 
 	public void initTargetTransforms() {

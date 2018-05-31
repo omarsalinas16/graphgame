@@ -18,12 +18,12 @@ public class FormBehaviour {
 	[Range(0.0f, 1.0f)]
 	private float maxAlpha = 1.0f;
 
-	public bool setFormToStart(Transform form, Level level) {
+	public bool setFormToStart(Transform form, Level level) {        
 		if (form && level != null) {
-			form.localPosition = level.startPosition;
+            Debug.Log("Set form to start: " + level.startPosition);
+            form.localPosition = level.startPosition;
 			form.Rotate(level.startRotation);
 			form.localScale = level.startScale;
-
 			return true;
 		}
 

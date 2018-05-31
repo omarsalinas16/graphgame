@@ -31,7 +31,7 @@ public class LevelsController : MonoBehaviour {
 	private const float RIGTH_MARGIN = 20.0f;
 
 	[SerializeField]
-	private float TOP_MARGIN = 60.0f;
+	private float TOP_MARGIN = 120.0f;
 	[SerializeField]
 	private float BOTTOM_MARGIN = 20.0f;
 
@@ -63,7 +63,7 @@ public class LevelsController : MonoBehaviour {
                     {
                         Debug.Log(level + " = " + Json.Serialize(dict[level]));
                         LevelFire levelFire = new LevelFire(Json.Serialize(dict[level]), level);
-                        levelsFire.Add(levelFire);
+                        if(!levelFire.Disabled) levelsFire.Add(levelFire);
                     }
                 }
                 addDinamicallyButtons(levelsFire);
@@ -125,7 +125,7 @@ public class LevelsController : MonoBehaviour {
 		}
 
 		float[] positionsY = new float[(int)numberButtonsY];
-		for(int i = 0; i < positionsY.Length; i++) {
+		for(int i = 0; i < positionsY.Length; i++) {            
 			positionsY[i] = (canvas_height / 2) - (TOP_MARGIN + heightButtons/2 + i*SPACE_Y + i*heightButtons); 
 		}
 		

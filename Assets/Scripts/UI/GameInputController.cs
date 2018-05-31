@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Assets.Scripts.DB.Firebase.ModelFire;
 
 public class GameInputController : MonoBehaviour {
 
@@ -181,8 +182,8 @@ public class GameInputController : MonoBehaviour {
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (positionChangedEvent != null && inputValues.Length == positionInputs.Length) {
 				positionChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
-				//saveMovement(inputValues, TypeTransform.POSITION);
-			}
+                saveMovement(TYPE_MOVEMENT.TRANSLATE, inputValues);
+            }
 		}
 	}
 
@@ -195,8 +196,8 @@ public class GameInputController : MonoBehaviour {
 					Debug.Log("Input values "+i+": " + inputValues[i]);
 				}				
 				rotationChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
-				//saveMovement(inputValues, TypeTransform.ROTATION);
-			}
+                saveMovement(TYPE_MOVEMENT.ROTATE, inputValues);
+            }
 		}
 
 		
@@ -208,14 +209,14 @@ public class GameInputController : MonoBehaviour {
 		if (gameController.substractAndTestTransformAttempts()) {
 			if (scalenChangedEvent != null && inputValues.Length == scaleInputs.Length) {
 				scalenChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
-				//saveMovement(inputValues, TypeTransform.SCALE);
+                saveMovement(TYPE_MOVEMENT.SCALE, inputValues);
 			}
 		}
 
 		
 	}
 
-	/*private void saveMovement(float[] inputValues, TypeTransform typeTransform) {
+    /*private void saveMovement(float[] inputValues, TypeTransform typeTransform) {
 		Vector3 movement;
 		
 		movement = new Vector3(inputValues[0], inputValues[1], inputValues[2]);
@@ -223,7 +224,14 @@ public class GameInputController : MonoBehaviour {
 		countTries++;
 	}*/
 
-	public void resetAll() {
+    private void saveMovement(TYPE_MOVEMENT t, float[] inputValues)
+    {
+        Vector3 movement;
+        movement = new Vector3(inputValues[0], inputValues[1], inputValues[2]);
+        LevelController.Instance.AddMovement(t, movement);        
+    }
+
+    public void resetAll() {
 		if (resetGameEvent != null) {
 			resetGameEvent();
 		}

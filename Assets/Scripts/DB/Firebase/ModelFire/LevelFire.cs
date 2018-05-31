@@ -10,21 +10,26 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
     public class LevelFire
     {
 
-        private const string TRANSLATION = "translation";
+        private const string TRANSLATION = "position";
         private const string ROTATION = "rotation";
         private const string SCALE = "scale";
 
+        public string Id { get; set; }
         public string Name { get; set; }
+        public bool Disabled { get; set; }
         public string StartState { get; set; }
         public string SolvedState { get; set; }
         public string PrefabName { get; set; }
         public int MaxSolveAttemps { get; set; }
         public int MaxTransformations { get; set; }
 
-        public LevelFire(string levelJSON, string name)
-        {
-            this.Name = name;
+        public LevelFire(string levelJSON, string id)
+        {            
+            this.Id = id;
             var level = Json.Deserialize(levelJSON) as Dictionary<string, object>;
+            this.Name = (string)level["name"];
+            //this.Disabled = ((string)level["disabled"]) == "true" ? true : false;
+            this.Disabled = (bool)level["disabled"];
             MaxSolveAttemps = (int)((Int64)level["max_attemps"]);
             MaxTransformations = (int)((Int64)level["max_transformations"]);            
             StartState = Json.Serialize(level["start_state"]);
@@ -81,6 +86,11 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
             Vector3 v = new Vector3(values[0], values[1], values[2]);
             Debug.Log(v);
             return v;
+        }
+
+        public static string GetCommaVector3(Vector3 vector) {
+            return vector.x + "," + vector.y + "+" + vector.z;
+
         }
     }
 }

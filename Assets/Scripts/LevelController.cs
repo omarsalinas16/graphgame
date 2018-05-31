@@ -20,10 +20,12 @@ public class LevelController : MonoBehaviour {
 
     //public GamePlayed ActualGame { get; set; }
 
-	public ModelFire.User user { get; set; }
+	public ModelFire.UserFire user { get; set; }
 	
 	public Transform cube;	
 	private const string CUBE = "Cube";
+
+    private GameFireMaker gameFireMaker;
 
 	private void Awake() {
 		if (Instance != null && Instance != this) {
@@ -38,8 +40,8 @@ public class LevelController : MonoBehaviour {
 	private void Start() {
 		// Read from an XML and set the levels array here?
 		if(user == null) {
-			user = new ModelFire.User {
-				username = "Lalito", email = "Lalito", uid = "1"				
+			user = new ModelFire.UserFire {
+				username = "Lalito", uid = "1"				
 			};
 			currentLevelIndex = 1;
 		}
@@ -47,13 +49,14 @@ public class LevelController : MonoBehaviour {
 
 	public Level getCurrentLevel() {
 		Debug.Log("CurrentLevelIndex " + currentLevelIndex);
-		/*ActualGame = GamePlayedDb.Insert(
+        /*ActualGame = GamePlayedDb.Insert(
 			new GamePlayed {
 				LevelId = currentLevelIndex,
 				Solved = false
 			}
 		);*/
         //return LevelsBuilder.GetById(currentLevelIndex).ToLevel(this);	
+        gameFireMaker = new GameFireMaker(user.uid, currentLevel.Id);
         return currentLevel.ToLevel(this);
 	}	
 
@@ -75,4 +78,8 @@ public class LevelController : MonoBehaviour {
 		}
 		return cube;
 	}
+
+    public void AddMovement(TYPE_MOVEMENT type, Vector3 movement) {
+        gameFireMaker.AddMovement(type, movement);
+    }
 }

@@ -14,7 +14,7 @@ public class MainMenuController : MonoBehaviour {
 	private TMP_Text userName;
 
 	public void Start() {
-		User user = LevelController.Instance.user;
+		UserFire user = LevelController.Instance.user;
 		if(user != null) {
 			SetUser(user);
 		}
@@ -49,7 +49,7 @@ public class MainMenuController : MonoBehaviour {
 		Debug.Log("Quitting game...");
 	}
 
-	public void SetUser(User user) {
+	public void SetUser(UserFire user) {
 		userName.text = user.username;
 	}
 

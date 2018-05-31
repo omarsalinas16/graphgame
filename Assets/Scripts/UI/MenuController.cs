@@ -11,7 +11,7 @@ public class MenuController : MonoBehaviour {
 	}
 
 	private GameObject currentForm;
-	private User user;
+	private UserFire user;
 
 	public GameObject loginForm;
 	public GameObject mainMenuForm;
@@ -29,7 +29,7 @@ public class MenuController : MonoBehaviour {
 		formsDictionary.Add(Forms.CREATE_LEVELS, createLevelsForm);		
 	}
 
-	public void GoToMainMenu(User user) {
+	public void GoToMainMenu(UserFire user) {
 		LevelController.Instance.user = user;		
 		appearForm(Forms.MAINMENU);
 		currentForm.GetComponent<MainMenuController>().SetUser(user);
