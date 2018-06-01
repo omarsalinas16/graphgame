@@ -895,7 +895,7 @@ Prefab:
         type: 2}
       propertyPath: cube
       value: 
-      objectReference: {fileID: 4541241259093008, guid: f5babc1efeda87d41beb64a7cbeac9c5,
+      objectReference: {fileID: 4899447417209846, guid: a6140b24d1cc53649b6e516fd1becbe0,
         type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 95d73ce872b181646bab21f58bc0bdb2, type: 2}

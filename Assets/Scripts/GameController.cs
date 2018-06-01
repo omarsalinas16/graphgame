@@ -145,16 +145,21 @@ public class GameController : MonoBehaviour {
 				endCurrentLevel();
 			} else {
 				solveTryAttempts--;
+
 				Debug.Log("Lose!");
 			}
 
 			planeSequenceStatus = PlaneSequenceStatus.Idle;
 			issueMovePlane = false;
 
-			if (solveTryAttempts > 0 && this.uiController) {
-				this.uiController.toggleSolveButton(true);
-				this.uiController.toggleTransformButtons(true);
-			}
+            if (solveTryAttempts > 0 && this.uiController)
+            {
+                this.uiController.toggleSolveButton(true);
+                this.uiController.toggleTransformButtons(true);
+            }
+            else {
+                LevelController.Instance.Lose();                
+            }
 		}
 
 		if (planeSequenceStatus > PlaneSequenceStatus.Idle && planeSequenceStatus < PlaneSequenceStatus.Ended) {
@@ -255,10 +260,11 @@ public class GameController : MonoBehaviour {
 		if (this.formBehaviour != null) {
 			this.formBehaviour.fadeOut(this.activeForm.gameObject, false);
 		}
-		/*GamePlayed gamePlayed = LevelController.Instance.ActualGame;
+        /*GamePlayed gamePlayed = LevelController.Instance.ActualGame;
 		gamePlayed.Solved = true;
 		GamePlayedDb.Update(gamePlayed);*/
-		Debug.Log("WIN");
+        LevelController.Instance.Win();
+        Debug.Log("WIN");
 	}
 
 	public Transform searchActiveForm() {

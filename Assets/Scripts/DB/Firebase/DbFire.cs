@@ -23,6 +23,13 @@ public class DbFire
         firebase.Child("levels",true).GetValue();
     }
 
+    public void InsertGamePlayed(Action<Firebase, DataSnapshot> onSuccess, Action<Firebase, FirebaseError> onFail, string jsonGamePlayed)
+    {
+        firebase.OnPushSuccess += onSuccess;
+        firebase.OnPushFailed += onFail;
+        firebase.Child("games_played", true).Push(jsonGamePlayed, true);
+    }
+
     // this can write
     /*public void IsUserValid(string email, string password, 
         Action<Firebase, DataSnapshot> PushOKHandler, Action<Firebase, FirebaseError> PushFailHandler) {

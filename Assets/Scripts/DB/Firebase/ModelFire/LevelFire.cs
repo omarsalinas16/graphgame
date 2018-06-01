@@ -89,7 +89,7 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
         }
 
         public static string GetCommaVector3(Vector3 vector) {
-            return vector.x + "," + vector.y + "+" + vector.z;
+            return vector.x + "," + vector.y + "," + vector.z;
 
         }
     }

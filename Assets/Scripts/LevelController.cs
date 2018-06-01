@@ -82,4 +82,14 @@ public class LevelController : MonoBehaviour {
     public void AddMovement(TYPE_MOVEMENT type, Vector3 movement) {
         gameFireMaker.AddMovement(type, movement);
     }
+
+    public void Win() {
+        gameFireMaker.End(true);
+    }
+
+    public void Lose() {
+        gameFireMaker.End(false);
+    }
+
+
 }

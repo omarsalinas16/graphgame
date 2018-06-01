@@ -96,17 +96,21 @@ public class PlayerController : MonoBehaviour {
 		setTargetTranslate(x, y, z);
 	}
 
-	private void setTargetRotation(float x, float y, float z) {		
+	private void setTargetRotation(float x, float y, float z) {
 
-		Vector3 currentRotation = new Vector3(activeForm.eulerAngles.x, activeForm.eulerAngles.y, activeForm.eulerAngles.z); 
+        Quaternion r = activeForm.rotation;
+
+        Vector3 currentRotation = new Vector3(r.eulerAngles.x, r.eulerAngles.y, r.eulerAngles.z); 
 		Vector3 targetRotation = new Vector3(x, y, z);
 
 		if (activeForm) {
-			Vector3 finalRotation = currentRotation + targetRotation;
-						
-			activeForm.DORotate(finalRotation, interpolationDuration, RotateMode.FastBeyond360).SetEase(interpolationEase);
-			
-		}
+            Debug.Log("Current rotation: " + currentRotation);
+            Debug.Log("Target rotation: " + targetRotation);
+            Vector3 finalRotation = currentRotation + targetRotation;
+            Debug.Log("Final rotation: " + finalRotation);
+            activeForm.DORotate(finalRotation, interpolationDuration, RotateMode.FastBeyond360).SetEase(interpolationEase);
+            //activeForm.Rotate(finalRotation);
+        }
 	}
 
 	public void addTargetRotation(float x, float y, float z) {		

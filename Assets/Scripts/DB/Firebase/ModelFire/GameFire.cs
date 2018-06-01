@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using SimpleFirebaseUnity;
+using SimpleFirebaseUnity.MiniJSON;
 
 namespace Assets.Scripts.DB.Firebase.ModelFire
 {
@@ -30,8 +32,19 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
         }
 
         public void AddMovement(TYPE_MOVEMENT type, string movement, int sequence) {
+            string typeMovement = getStringTypeMovement(type);
+            movements.Add(new Movement
+            {
+                sequence = sequence,
+                typeMovement = typeMovement,
+                movement = movement
+            });
+        }
+
+        private string getStringTypeMovement(TYPE_MOVEMENT type) {
             string typeMovement = "";
-            switch (type) {
+            switch (type)
+            {
                 case TYPE_MOVEMENT.ROTATE:
                     typeMovement = ROTATE;
                     break;
@@ -40,14 +53,33 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
                     break;
                 case TYPE_MOVEMENT.TRANSLATE:
                     typeMovement = TRANSLATE;
-                    break;                
+                    break;
             }
-            movements.Add(new Movement
+            return typeMovement;
+        }
+
+        public string ToJson() {
+
+            var movementsDict = new Dictionary<int, Dictionary<string, string>>();
+            for (int i = 0; i < movements.Count(); i ++) {
+                var m = movements[i];
+                
+                var moveDict = new Dictionary<string, string> {
+                    { m.typeMovement, m.movement }
+                };
+                movementsDict.Add(i, moveDict);                
+            }
+            var gamePlayed = new Dictionary<string, object>
             {
-                sequence = sequence,
-                typeMovement = typeMovement,
-                movement = movement
-            });
+                { "level", this.LevelId },
+                { "user", this.UserUID },
+                { "movements", movementsDict },
+                { "solved", Solved}
+            };
+            var jsonGamePlayed = Json.Serialize(gamePlayed);
+
+            return jsonGamePlayed;
+
         }
     }
 
@@ -66,7 +98,21 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
 
         public void End(bool solved) {
             gameFire.Solved = solved;
-            // TODO: convert gameFire to JSON and insert in firebase
+            var jsonGamePlayed = gameFire.ToJson();
+            Debug.Log(jsonGamePlayed);
+            var dbFire = new DbFire();
+            dbFire.InsertGamePlayed(
+                delegate (SimpleFirebaseUnity.Firebase f, DataSnapshot d)
+                {
+                    Debug.Log("Push success");
+                },
+                delegate (SimpleFirebaseUnity.Firebase f, FirebaseError e)
+                {
+                    Debug.Log("Push error");
+                },
+                jsonGamePlayed
+            );
+            // TODO: if the json is ok then push into firebase
         }
     }
 
