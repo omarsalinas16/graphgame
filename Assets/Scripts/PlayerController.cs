@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour {
 	private Vector2 scaleLimits;
 	private Vector3 targetScale;
 
+    private Vector3 currentRotation = new Vector3(0,45,0);
+
 	private void Awake() {
 		if (Instance != null && Instance != this) {
 			Destroy(gameObject);
@@ -60,7 +62,7 @@ public class PlayerController : MonoBehaviour {
 
 		if (uiController) {
 			uiController.positionChangedEvent += addTargetTranslate;
-			uiController.rotationChangedEvent += addTargetRotation;
+			uiController.rotationChangedEvent += setTargetRotation;
 			uiController.scalenChangedEvent += addTargetScale;
 
 			uiController.resetGameEvent += initTargetTransforms;
@@ -74,7 +76,8 @@ public class PlayerController : MonoBehaviour {
 
 	public void initTargetTransforms() {
 		setTargetTranslate(0.0f, 0.0f, 0.0f);
-		setTargetRotation(0.0f, 0.0f, 0.0f);
+        // TODO: i just commented but i think this will not be a problem
+		//setTargetRotation(0.0f, 0.0f, 0.0f);
 		setTargetScale(1.0f, 1.0f, 1.0f);
 	}
 
@@ -96,27 +99,37 @@ public class PlayerController : MonoBehaviour {
 		setTargetTranslate(x, y, z);
 	}
 
-	private void setTargetRotation(float x, float y, float z) {
-
-        Quaternion r = activeForm.rotation;
-
-        Vector3 currentRotation = new Vector3(r.eulerAngles.x, r.eulerAngles.y, r.eulerAngles.z); 
-		Vector3 targetRotation = new Vector3(x, y, z);
-
+	private void setTargetRotation(float rotation, GameInputController.ROTATION_AXIS axis) {
+        
 		if (activeForm) {
-            Debug.Log("Current rotation: " + currentRotation);
-            Debug.Log("Target rotation: " + targetRotation);
-            Vector3 finalRotation = currentRotation + targetRotation;
-            Debug.Log("Final rotation: " + finalRotation);
-            activeForm.DORotate(finalRotation, interpolationDuration, RotateMode.FastBeyond360).SetEase(interpolationEase);
-            //activeForm.Rotate(finalRotation);
+            
+            Vector3 currentRotation = new Vector3();
+            Quaternion r;
+            switch (axis) {
+                case GameInputController.ROTATION_AXIS.X:
+                    activeForm.RotateAround(activeForm.position, activeForm.right, rotation);
+                    r = activeForm.rotation;
+                    currentRotation = new Vector3(r.eulerAngles.x, r.eulerAngles.y, r.eulerAngles.z);
+                    //activeForm.RotateAround(activeForm.position, activeForm.right, -rotation);
+                    break;
+                case GameInputController.ROTATION_AXIS.Y:
+                    activeForm.RotateAround(activeForm.position, activeForm.up, rotation);
+                    r = activeForm.rotation;
+                    currentRotation = new Vector3(r.eulerAngles.x, r.eulerAngles.y, r.eulerAngles.z);
+                    //activeForm.RotateAround(activeForm.position, activeForm.up, -rotation);
+                    break;
+                case GameInputController.ROTATION_AXIS.Z:
+                    activeForm.RotateAround(activeForm.position, activeForm.forward, rotation);
+                    r = activeForm.rotation;
+                    currentRotation = new Vector3(r.eulerAngles.x, r.eulerAngles.y, r.eulerAngles.z);
+                    //activeForm.RotateAround(activeForm.position, activeForm.forward, -rotation);
+                    break;
+            }                        
+            //activeForm.DORotate(currentRotation, interpolationDuration, RotateMode.FastBeyond360).SetEase(interpolationEase);
+            // TODO: make the animarion great again
+            
         }
-	}
-
-	public void addTargetRotation(float x, float y, float z) {		
-
-		setTargetRotation(x, y, z);
-	}
+	}	
 
 	private void setTargetScale(float x, float y, float z) {
 		targetScale.x = Mathf.Clamp(x, scaleLimits.x, scaleLimits.y);
@@ -127,7 +140,7 @@ public class PlayerController : MonoBehaviour {
 			activeForm.DOScaleX(targetScale.x, interpolationDuration).SetEase(interpolationEase);
 			activeForm.DOScaleY(targetScale.y, interpolationDuration).SetEase(interpolationEase);
 			activeForm.DOScaleZ(targetScale.z, interpolationDuration).SetEase(interpolationEase);
-		}
+        }
 	}
 
 	public void addTargetScale(float x, float y, float z) {

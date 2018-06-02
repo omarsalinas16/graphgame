@@ -37,6 +37,7 @@ public class AddGizmos : MonoBehaviour {
         GL.PushMatrix();
         // Set transformation matrix for drawing to
         // match our transform
+
         GL.MultMatrix(transform.localToWorldMatrix);
         //GL.MultMatrix(transform.worldToLocalMatrix);
 

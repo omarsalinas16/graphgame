@@ -22,8 +22,12 @@ public class FormBehaviour {
 		if (form && level != null) {
             Debug.Log("Set form to start: " + level.startPosition);
             form.localPosition = level.startPosition;
-			form.Rotate(level.startRotation);
-			form.localScale = level.startScale;
+
+            Debug.Log("Level start rotation: " + level.startRotation);                        
+            Vector3 sr = level.startRotation;
+            form.rotation = Quaternion.Euler(sr.x, sr.y, sr.z);    
+            
+            form.localScale = level.startScale;
 			return true;
 		}
 
@@ -33,6 +37,7 @@ public class FormBehaviour {
 	public bool setFormToFinal(Transform form, Level level, float scaleOffsetFix) {
 		if (form && level != null) {
 			form.localPosition = level.position;
+            
 			form.Rotate(level.rotation);
 
 			// Temporal scale fix for plane colliders.

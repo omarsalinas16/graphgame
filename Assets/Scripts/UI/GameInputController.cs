@@ -14,7 +14,7 @@ public class GameInputController : MonoBehaviour {
 	public delegate void OnPositionChanged(float x, float y, float z);
 	public event OnPositionChanged positionChangedEvent;
 
-	public delegate void OnRotationChanged(float x, float y, float z);
+	public delegate void OnRotationChanged(float r, ROTATION_AXIS axis);
 	public event OnRotationChanged rotationChangedEvent;
 
 	public delegate void OnScaleChanged(float x, float y, float z);
@@ -46,7 +46,7 @@ public class GameInputController : MonoBehaviour {
 	[SerializeField]
 	private Button rotateButton;
 	[SerializeField]
-	private TMP_InputField[] rotationInputs = new TMP_InputField[3];
+	private TMP_InputField rotationInput;
 
 	[Header("Scale Fields")]
 	[SerializeField]
@@ -93,9 +93,10 @@ public class GameInputController : MonoBehaviour {
 			setPosition();
 		}
 
-		if (Input.GetKeyDown(KeyCode.R)) {
+        // TODO: i think this is not longer possible since for rotation there is more than one possibility
+		/*if (Input.GetKeyDown(KeyCode.R)) {
 			setRotation();
-		}
+		}*/
 
 		if (Input.GetKeyDown(KeyCode.S)) {
 			setScale();
@@ -187,23 +188,49 @@ public class GameInputController : MonoBehaviour {
 		}
 	}
 
-	public void setRotation() {
-		float[] inputValues = rotationInputs.Select(input => readInputValue(input)).ToArray();
+	public void setRotationX() {
+        setRotation(ROTATION_AXIS.X);
+    }
 
-		if (gameController.substractAndTestTransformAttempts()) {
-			if (rotationChangedEvent != null && inputValues.Length == rotationInputs.Length) {
-				for(int i = 0; i < inputValues.Length; i++) {
-					Debug.Log("Input values "+i+": " + inputValues[i]);
-				}				
-				rotationChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
-                saveMovement(TYPE_MOVEMENT.ROTATE, inputValues);
+    public void setRotationY()
+    {
+        setRotation(ROTATION_AXIS.Y);
+    }
+
+    public void setRotationZ()
+    {
+        setRotation(ROTATION_AXIS.Z);
+    }
+
+    public void setRotation(ROTATION_AXIS axis)
+    {
+        float inputRotation = readInputValue(rotationInput);
+
+        if (gameController.substractAndTestTransformAttempts())
+        {
+            if (rotationChangedEvent != null && inputRotation != 0)
+            {                
+                rotationChangedEvent(inputRotation, axis);
+                float[] rotation = new float[3];
+                switch (axis) {
+                    case ROTATION_AXIS.X:
+                        rotation = new float[]{ inputRotation, 0, 0 };
+                        break;
+                    case ROTATION_AXIS.Y:
+                        rotation = new float[] { 0, inputRotation, 0 };
+                        break;
+                    case ROTATION_AXIS.Z:
+                        rotation = new float[] { 0, 0, inputRotation };
+                        break;
+                }
+                saveMovement(TYPE_MOVEMENT.ROTATE, rotation);
             }
-		}
+        }
+    }
 
-		
-	}
 
-	public void setScale() {
+
+    public void setScale() {
 		float[] inputValues = scaleInputs.Select(input => readInputValue(input, 1.0f)).ToArray();
 
 		if (gameController.substractAndTestTransformAttempts()) {
@@ -236,4 +263,8 @@ public class GameInputController : MonoBehaviour {
 			resetGameEvent();
 		}
 	}
+
+    public enum ROTATION_AXIS {
+        X, Y, Z
+    }
 }
