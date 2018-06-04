@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using HoleMaker;
 
+
 public enum PlaneSequenceStatus {
 	Idle = 0,
 	MovingX = 1,
@@ -88,6 +89,8 @@ public class GameController : MonoBehaviour {
 	private PlayerController playerController;
 	private LevelController levelController;
 	private GameInputController uiController;
+
+    public TransformationsHelper transformationsHelper { get; private set; }
 
 	private void Awake() {
 		if (Instance != null && Instance != this) {
@@ -203,12 +206,13 @@ public class GameController : MonoBehaviour {
 
 	private void setAndInitCurrentLevel() {
 		if (this.levelController) {
-			currentLevel = this.levelController.getCurrentLevel();
+            currentLevel = this.levelController.getCurrentLevel();
+            //currentLevel = new Level { form = this.levelController.GetTranformWithPrefabName("Cube") };
 		}
 
 		if (currentLevel != null) {
 			activeForm = Instantiate(currentLevel.form, formSpawn.position, Quaternion.identity, formSpawn);
-			
+            transformationsHelper = new TransformationsHelper(activeForm);
 			if (this.playerController) {
 				this.playerController.setActiveForm(getActiveForm());
 			}
@@ -239,15 +243,22 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void setFormToSolution() {
-		if (this.formBehaviour != null) {
+        /*if (this.formBehaviour != null) {
 			this.formBehaviour.setFormToFinal(this.activeForm, this.currentLevel, this.scaleOffsetFix);
-		}
-	}
+		}*/
+        if (transformationsHelper != null)
+        {
+            transformationsHelper.setFormToSolvedState(this.currentLevel);
+        }
+    }
 
 	private void setFormToStartPosition() {
-		if (this.formBehaviour != null) {
+        if (transformationsHelper != null) {
+            transformationsHelper.setFormToStartState(this.currentLevel);
+        }
+		/*if (this.formBehaviour != null) {
 			this.formBehaviour.setFormToStart(this.activeForm, this.currentLevel);
-		}
+		}*/
 	}
 
 	private void fadeInForm() {

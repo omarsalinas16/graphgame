@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using DG.Tweening;
 
+/// <summary>
+/// This will only in charge of the fade for the moment
+/// </summary>
 [System.Serializable]
 public class FormBehaviour {
 
@@ -18,14 +21,12 @@ public class FormBehaviour {
 	[Range(0.0f, 1.0f)]
 	private float maxAlpha = 1.0f;
 
-	public bool setFormToStart(Transform form, Level level) {        
+	/*public bool setFormToStart(Transform form, Level level) {        
 		if (form && level != null) {
             Debug.Log("Set form to start: " + level.startPosition);
             form.localPosition = level.startPosition;
 
-            Debug.Log("Level start rotation: " + level.startRotation);                        
-            Vector3 sr = level.startRotation;
-            form.rotation = Quaternion.Euler(sr.x, sr.y, sr.z);    
+            //form.rotation = Quaternion.Euler(sr.x, sr.y, sr.z);    
             
             form.localScale = level.startScale;
 			return true;
@@ -38,7 +39,7 @@ public class FormBehaviour {
 		if (form && level != null) {
 			form.localPosition = level.position;
             
-			form.Rotate(level.rotation);
+			//form.Rotate(level.rotation);
 
 			// Temporal scale fix for plane colliders.
 			form.localScale = level.scale + new Vector3(scaleOffsetFix, scaleOffsetFix, scaleOffsetFix);
@@ -47,7 +48,7 @@ public class FormBehaviour {
 		}
 
 		return false;
-	}
+	}*/
 
 	public bool fadeIn(GameObject form) {
 		return fade(form, this.maxAlpha);

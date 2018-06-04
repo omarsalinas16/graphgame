@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using DG.Tweening;
+using System.Collections.Generic;
 
+/// <summary>
+/// This is deprecated and replaced by TransformationsHelper
+/// </summary>
 public class PlayerController : MonoBehaviour {
 
 	public static PlayerController Instance { get; private set; }
@@ -75,13 +79,24 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void initTargetTransforms() {
-		setTargetTranslate(0.0f, 0.0f, 0.0f);
-        // TODO: i just commented but i think this will not be a problem
-		//setTargetRotation(0.0f, 0.0f, 0.0f);
-		setTargetScale(1.0f, 1.0f, 1.0f);
-	}
+        
+    }
 
-	private void setTargetTranslate(float x, float y, float z) {
+    private void setFormToTranformation(Vector3 t, Vector3 s, List<Level.Rotation> rs) {        
+        setTargetTranslate(t.x, t.y, t.z);
+        foreach (Level.Rotation r in rs) {
+            setTargetRotation(r.Value, r.Axis);
+        }        
+        setTargetScale(s.x, s.y, s.z);        
+    }
+
+    private void resetForm() {
+        activeForm.position = new Vector3(0, 0, 0);        
+        activeForm.rotation = Quaternion.Euler(0, 0, 0);
+        activeForm.localScale = new Vector3(1, 1, 1);
+    }
+
+    private void setTargetTranslate(float x, float y, float z) {
 		targetTranslate.x = Mathf.Clamp(x, translateLimitsMin.x, translateLimitsMax.x);
 		targetTranslate.y = Mathf.Clamp(y, translateLimitsMin.y, translateLimitsMax.y);
 		targetTranslate.z = Mathf.Clamp(z, translateLimitsMin.z, translateLimitsMax.z);
@@ -137,16 +152,17 @@ public class PlayerController : MonoBehaviour {
 		targetScale.z = Mathf.Clamp(z, scaleLimits.x, scaleLimits.y);
 
 		if (activeForm) {
-			activeForm.DOScaleX(targetScale.x, interpolationDuration).SetEase(interpolationEase);
-			activeForm.DOScaleY(targetScale.y, interpolationDuration).SetEase(interpolationEase);
-			activeForm.DOScaleZ(targetScale.z, interpolationDuration).SetEase(interpolationEase);
+			//activeForm.DOScaleX(targetScale.x, interpolationDuration).SetEase(interpolationEase);
+			//activeForm.DOScaleY(targetScale.y, interpolationDuration).SetEase(interpolationEase);
+			//activeForm.DOScaleZ(targetScale.z, interpolationDuration).SetEase(interpolationEase);
+            activeForm.DOScale(targetScale, interpolationDuration).SetEase(interpolationEase);
         }
 	}
 
 	public void addTargetScale(float x, float y, float z) {
-		x *= targetScale.x;
-		y *= targetScale.y;
-		z *= targetScale.z;
+		x += targetScale.x;
+		y += targetScale.y;
+		z += targetScale.z;
 
 		setTargetScale(x, y, z);
 	}

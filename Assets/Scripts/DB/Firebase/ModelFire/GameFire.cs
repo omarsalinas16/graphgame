@@ -17,7 +17,7 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
         public string UserUID { get; set; }
         public string LevelId { get; set; }
         public List<Movement> movements { get; set; }
-        public bool Solved { get; set; }
+        public bool Solved { get; set; }        
 
         public GameFire(string userId, string levelId) {
             UserUID = userId;
@@ -74,7 +74,8 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
                 { "level", this.LevelId },
                 { "user", this.UserUID },
                 { "movements", movementsDict },
-                { "solved", Solved}
+                { "solved", Solved},
+                { "date" , DateTime.Now.ToString("M/d/yyyy") } /*string iDate = "05/05/2005";DateTime oDate = Convert.ToDateTime(iDate);*/
             };
             var jsonGamePlayed = Json.Serialize(gamePlayed);
 

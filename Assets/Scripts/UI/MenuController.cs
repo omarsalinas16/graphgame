@@ -55,7 +55,14 @@ public class MenuController : MonoBehaviour {
 
 	void Awake() {
 		fillFormsDictionary();
-		appearForm(Forms.LOGIN);
+        if (LevelController.Instance.user != null)
+        {
+            appearForm(Forms.MAINMENU);
+        }
+        else {
+            appearForm(Forms.LOGIN);
+        }
+		
 	}
 
 

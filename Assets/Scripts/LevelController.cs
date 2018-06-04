@@ -57,6 +57,7 @@ public class LevelController : MonoBehaviour {
 		);*/
         //return LevelsBuilder.GetById(currentLevelIndex).ToLevel(this);	
         gameFireMaker = new GameFireMaker(user.uid, currentLevel.Id);
+        //gameFireMaker = new GameFireMaker("user_prueba", "level_prueba");
         return currentLevel.ToLevel(this);
 	}	
 

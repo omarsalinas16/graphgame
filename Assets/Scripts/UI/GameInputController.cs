@@ -7,6 +7,8 @@ using Assets.Scripts.DB.Firebase.ModelFire;
 
 public class GameInputController : MonoBehaviour {
 
+    //TODO: clear reference to PlayerController
+
 	public static GameInputController Instance { get; private set; }
 
 	private GameController gameController;
@@ -59,8 +61,7 @@ public class GameInputController : MonoBehaviour {
     int maxSolveAttempts = 0;
     int maxTransformations = 0;
 
-    public GameObject gameObjectController;
-
+    public GameObject gameObjectController;    
 
     private void Awake() {
         /*if (Instance != null && Instance != this) {
@@ -81,9 +82,9 @@ public class GameInputController : MonoBehaviour {
 			gameController.tryAttemptsChangedEvent += setTryAttemptsToggles;
 			gameController.transformAttemptsChangedEvent += setTransformAttempsLabel;
 		}
-
-        maxSolveAttempts = LevelController.Instance.getCurrentLevel().maxSolveAttempts;
-        maxTransformations = LevelController.Instance.getCurrentLevel().maxTransformations;
+        Level currentLevel = LevelController.Instance.getCurrentLevel();
+        maxSolveAttempts = currentLevel.maxSolveAttempts;
+        maxTransformations = currentLevel.maxTransformations;
         //setTryAttemptsToggles(LevelController.Instance.getCurrentLevel().maxSolveAttempts);
         //setTransformAttempsLabel(LevelController.Instance.getCurrentLevel().maxTransformations);        
     }
@@ -181,8 +182,8 @@ public class GameInputController : MonoBehaviour {
 		float[] inputValues = positionInputs.Select(input => readInputValue(input)).ToArray();
 
 		if (gameController.substractAndTestTransformAttempts()) {
-			if (positionChangedEvent != null && inputValues.Length == positionInputs.Length) {
-				positionChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
+			if (gameController.transformationsHelper != null && inputValues.Length == positionInputs.Length) {
+                gameController.transformationsHelper.setTargetTranslate(new Vector3(inputValues[0], inputValues[1], inputValues[2]));
                 saveMovement(TYPE_MOVEMENT.TRANSLATE, inputValues);
             }
 		}
@@ -208,9 +209,9 @@ public class GameInputController : MonoBehaviour {
 
         if (gameController.substractAndTestTransformAttempts())
         {
-            if (rotationChangedEvent != null && inputRotation != 0)
+            if (gameController.transformationsHelper != null && inputRotation != 0)
             {                
-                rotationChangedEvent(inputRotation, axis);
+                gameController.transformationsHelper.setTargetRotation(inputRotation, axis);
                 float[] rotation = new float[3];
                 switch (axis) {
                     case ROTATION_AXIS.X:
@@ -234,8 +235,8 @@ public class GameInputController : MonoBehaviour {
 		float[] inputValues = scaleInputs.Select(input => readInputValue(input, 1.0f)).ToArray();
 
 		if (gameController.substractAndTestTransformAttempts()) {
-			if (scalenChangedEvent != null && inputValues.Length == scaleInputs.Length) {
-				scalenChangedEvent(inputValues[0], inputValues[1], inputValues[2]);
+			if (gameController.transformationsHelper != null && inputValues.Length == scaleInputs.Length) {
+                gameController.transformationsHelper.setTargetScale(new Vector3(inputValues[0], inputValues[1], inputValues[2]));                
                 saveMovement(TYPE_MOVEMENT.SCALE, inputValues);
 			}
 		}

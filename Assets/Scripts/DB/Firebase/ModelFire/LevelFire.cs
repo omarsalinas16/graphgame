@@ -45,10 +45,10 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
             {
                 name = this.Name,
                 startPosition = startState[TRANSLATION],
-                startRotation = startState[ROTATION],
+                startRotations = getListOfRotations(StartState),
                 startScale = startState[SCALE],
                 position = solvedState[TRANSLATION],
-                rotation = solvedState[ROTATION],
+                rotations = getListOfRotations(SolvedState),
                 scale = solvedState[SCALE],
                 maxSolveAttempts = this.MaxSolveAttemps,
                 maxTransformations = this.MaxTransformations,
@@ -56,15 +56,56 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
             };
         }
 
+        private List<Level.Rotation> getListOfRotations(string stateJSON) {
+            var state = Json.Deserialize(stateJSON) as Dictionary<string, object>;
+            var rotations = state[ROTATION] as List<object>;
+            /*var rotationsJson = Json.Serialize(state[ROTATION]);
+            Debug.Log("Rotations: " + state[ROTATION]);
+            var rotations = Json.Deserialize(rotationsJson) as Dictionary<string, object>;*/
+            // TODO: check if this works
+            //rotations.OrderBy(r => r.Key);
+
+            List<Level.Rotation> rotationsList = new List<Level.Rotation>();
+            foreach (object rs in rotations) {
+                Debug.Log("Rot: " + rs);
+                var rotationJson = Json.Serialize(rs);
+                Debug.Log("Rot: " + rotationJson);
+                var rotation = Json.Deserialize(rotationJson) as Dictionary<string, object>;
+                foreach (KeyValuePair<string, object> r in rotation)
+                {
+                    GameInputController.ROTATION_AXIS axis = GameInputController.ROTATION_AXIS.X;
+                    if (r.Key == "x")
+                    {
+                        axis = GameInputController.ROTATION_AXIS.X;
+
+                    }
+                    else if (r.Key == "y") {
+                        axis = GameInputController.ROTATION_AXIS.Y;
+                    }
+                    else if (r.Key == "z")
+                    {
+                        axis = GameInputController.ROTATION_AXIS.Z;
+                    }
+                    Debug.Log("Axis: " + axis + " Value: " + r.Value);
+                    rotationsList.Add(new Level.Rotation
+                    {
+                        Axis = axis,
+                        Value = ((float)(Int64)r.Value)
+                    });
+                }                
+            }
+            return rotationsList;
+        }
+
         public Dictionary<string,Vector3> ConvertState2Transform(string stateJSON) {
             var state = Json.Deserialize(stateJSON) as Dictionary<string, object>;
             var translation = (string)state[TRANSLATION];
-            var rotation = (string)state[ROTATION];
+            //var rotation = (string)state[ROTATION];
             var scale = (string)state[SCALE];
 
             Dictionary<string, Vector3> transformation = new Dictionary<string, Vector3>();
             transformation.Add(TRANSLATION, GetVector3(translation));
-            transformation.Add(ROTATION, GetVector3(rotation));
+            //transformation.Add(ROTATION, GetVector3(rotation));
             transformation.Add(SCALE, GetVector3(scale));
 
             return transformation;
