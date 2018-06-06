@@ -14,8 +14,11 @@ public class Level {
 	public Vector3 position { get; set; }
 	public List<Rotation> rotations { get; set; }    
 	public Vector3 scale { get; set; }
-	
-	public int maxSolveAttempts { get; set; }
+
+    public float stepScale { get; set; }
+    public float stepTranslate { get; set; }
+
+    public int maxSolveAttempts { get; set; }
 	public int maxTransformations { get; set; }
 
     public class Rotation {

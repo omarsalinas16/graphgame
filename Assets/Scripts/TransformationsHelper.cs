@@ -24,9 +24,85 @@ public class TransformationsHelper
     private Ease interpolationEase = Ease.InOutCubic;
 
     private Transform activeForm;
-    public TransformationsHelper(Transform activeForm) {
+    private float stepScale;
+    private float stepTranslate;
+    public TransformationsHelper(Transform activeForm, float stepScale, float stepTranslate) {
         this.activeForm = activeForm;
+        this.stepScale = stepScale;
+        this.stepTranslate = stepTranslate;
         scaleOffsetForSolvedScale = new Vector3(scaleOffsetFix, scaleOffsetFix, scaleOffsetFix);
+    }
+
+    public float incrementScaleX(int direction, float currentValue)
+    {
+        return incrementScale(direction, currentValue, activeForm.localScale.x, scaleLimitsMin.x, scaleLimitsMax.x);
+    }
+
+    public float incrementScaleY(int direction, float currentValue)
+    {
+        return incrementScale(direction, currentValue, activeForm.localScale.y, scaleLimitsMin.y, scaleLimitsMax.y);
+    }
+
+    public float incrementScaleZ(int direction, float currentValue)
+    {        
+        return incrementScale(direction, currentValue, activeForm.localScale.z, scaleLimitsMin.z, scaleLimitsMax.z);
+    }
+
+    public float incrementPositionX(int direction, float currentValue)
+    {
+        return incrementPosition(direction, currentValue, activeForm.localPosition.x, translateLimitsMin.x, translateLimitsMax.x);
+    }
+
+    public float incrementPositionY(int direction, float currentValue)
+    {
+        return incrementPosition(direction, currentValue, activeForm.localPosition.y, translateLimitsMin.y, translateLimitsMax.y);
+    }
+
+    public float incrementPositionZ(int direction, float currentValue)
+    {
+        return incrementPosition(direction, currentValue, activeForm.localPosition.z, translateLimitsMin.z, translateLimitsMax.z);
+    }
+    
+    public float incrementPosition(int direction,float currentValue, float currentFormPosition, float min, float max) {
+        var wantedValue = currentValue + stepScale * direction;
+        // TODO: i would prefer to no longer have the limits in a vector3 and only hava a translateLimitMin and translateLimitMax
+        var resultFormPosition = currentFormPosition + wantedValue;
+        if (resultFormPosition > max)
+        {
+            wantedValue = max - currentFormPosition;
+        }
+        else if (resultFormPosition < min)
+        {
+            wantedValue = min - currentFormPosition;
+        }
+        return wantedValue;
+    }
+
+    public float incrementScale(int direction, float currentValue, float currentFormScale, float min, float max)
+    {
+        var wantedValue = currentValue + stepTranslate * direction;
+        // TODO: i would prefer to no longer have the limits in a vector3 and only hava a translateLimitMin and translateLimitMax
+        var resultFormPosition = currentFormScale * wantedValue;
+        Debug.Log(resultFormPosition);
+        if (currentFormScale != 0) {
+            if (resultFormPosition % stepTranslate != 0)
+            {
+                resultFormPosition = (float)Math.Round(resultFormPosition);
+                wantedValue = resultFormPosition / currentFormScale;
+            }
+
+            if (resultFormPosition > max)
+            {
+               wantedValue = max / currentFormScale;                
+            }
+            else if (resultFormPosition < min)
+            {
+               wantedValue = min / currentFormScale;             
+            }
+        }
+        
+        
+        return wantedValue;
     }
 
     public void setFormToStartState(Level level) {
@@ -59,16 +135,12 @@ public class TransformationsHelper
     public void setTargetTranslate(Vector3 t, bool animate = true)
     {
         Vector3 targetTranslate = activeForm.localPosition;
-        Debug.Log("Current translate: " + targetTranslate);
-        Debug.Log("Add translate: " + t);
         targetTranslate.x += t.x;
         targetTranslate.y += t.y;
         targetTranslate.z += t.z;
-        Debug.Log("Target scale before clamp: " + targetTranslate);
-        targetTranslate.x = Mathf.Clamp(targetTranslate.x, translateLimitsMin.x, translateLimitsMax.x);
+        /*targetTranslate.x = Mathf.Clamp(targetTranslate.x, translateLimitsMin.x, translateLimitsMax.x);
         targetTranslate.y = Mathf.Clamp(targetTranslate.y, translateLimitsMin.y, translateLimitsMax.y);
-        targetTranslate.z = Mathf.Clamp(targetTranslate.z, translateLimitsMin.z, translateLimitsMax.z);
-        Debug.Log("Target scale: " + targetTranslate);
+        targetTranslate.z = Mathf.Clamp(targetTranslate.z, translateLimitsMin.z, translateLimitsMax.z);*/
         if (activeForm)
         {
             if (animate)
@@ -88,10 +160,9 @@ public class TransformationsHelper
         targetScale.y *= s.y;
         targetScale.z *= s.z;        
         
-        targetScale.x = Mathf.Clamp(targetScale.x, scaleLimitsMin.x, scaleLimitsMax.x);
+        /*targetScale.x = Mathf.Clamp(targetScale.x, scaleLimitsMin.x, scaleLimitsMax.x);
         targetScale.y = Mathf.Clamp(targetScale.y, scaleLimitsMin.y, scaleLimitsMax.y);
-        targetScale.z = Mathf.Clamp(targetScale.z, scaleLimitsMin.z, scaleLimitsMax.z);
-        Debug.Log("Target scale: " + targetScale);
+        targetScale.z = Mathf.Clamp(targetScale.z, scaleLimitsMin.z, scaleLimitsMax.z);*/
 
         if (activeForm)
         {

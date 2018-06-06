@@ -20,6 +20,8 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
         public string StartState { get; set; }
         public string SolvedState { get; set; }
         public string PrefabName { get; set; }
+        public float StepScale { get; set; }
+        public float StepTranslate { get; set; }
         public int MaxSolveAttemps { get; set; }
         public int MaxTransformations { get; set; }
 
@@ -27,9 +29,29 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
         {            
             this.Id = id;
             var level = Json.Deserialize(levelJSON) as Dictionary<string, object>;
+            var stepsScale = level["steps_scale"];
+            var stepsTranslate = level["steps_translate"];
+            if (stepsScale.GetType() == typeof(Int64)) {
+                this.StepScale = (Int64)stepsScale;
+            } else if (stepsScale.GetType() == typeof(Double))
+            {
+                this.StepScale = (float)((Double)stepsScale);
+            }
+            if (stepsTranslate.GetType() == typeof(Int64))
+            {
+                this.StepTranslate = (Int64)stepsTranslate;
+            }
+            else if (stepsTranslate.GetType() == typeof(Double))
+            {
+                this.StepTranslate = (float)((Double)stepsTranslate);
+            }            
             this.Name = (string)level["name"];
+            //this.StepScale = (float)((Int64)level["steps_scale"]);            
+            //this.StepTranslate = (float)((Int64)level["steps_translate"]);
+            //Debug.Log("Steps: " + StepScale + " " + StepTranslate);
             //this.Disabled = ((string)level["disabled"]) == "true" ? true : false;
             this.Disabled = (bool)level["disabled"];
+            MaxSolveAttemps = (int)((Int64)level["max_attemps"]);
             MaxSolveAttemps = (int)((Int64)level["max_attemps"]);
             MaxTransformations = (int)((Int64)level["max_transformations"]);            
             StartState = Json.Serialize(level["start_state"]);
@@ -52,7 +74,9 @@ namespace Assets.Scripts.DB.Firebase.ModelFire
                 scale = solvedState[SCALE],
                 maxSolveAttempts = this.MaxSolveAttemps,
                 maxTransformations = this.MaxTransformations,
-                form = formLevel.GetTranformWithPrefabName(this.PrefabName)
+                form = formLevel.GetTranformWithPrefabName(this.PrefabName),
+                stepScale = this.StepScale,
+                stepTranslate = this.StepTranslate
             };
         }
 

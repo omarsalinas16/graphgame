@@ -212,7 +212,7 @@ public class GameController : MonoBehaviour {
 
 		if (currentLevel != null) {
 			activeForm = Instantiate(currentLevel.form, formSpawn.position, Quaternion.identity, formSpawn);
-            transformationsHelper = new TransformationsHelper(activeForm);
+            transformationsHelper = new TransformationsHelper(activeForm, currentLevel.stepScale, currentLevel.stepTranslate);
 			if (this.playerController) {
 				this.playerController.setActiveForm(getActiveForm());
 			}

@@ -250,7 +250,7 @@ public class GameInputController : MonoBehaviour {
 		movement = new Vector3(inputValues[0], inputValues[1], inputValues[2]);
 		MovementInGameDb.Insert(movement, typeTransform, countTries, LevelController.Instance.ActualGame.Id);
 		countTries++;
-	}*/
+	}*/        
 
     private void saveMovement(TYPE_MOVEMENT t, float[] inputValues)
     {
