@@ -287,4 +287,12 @@ public class GameController : MonoBehaviour {
 	public Transform getActiveForm() {
 		return activeForm ? activeForm : searchActiveForm();
 	}
+
+    // This duplicates the cube and send it to the hole in the wall
+    public void duplicateCubesAndFillHoles() {
+        var cubeClone = Object.Instantiate(activeForm.gameObject);
+        transformationsHelper.fillHoles(activeForm, cubeClone.transform);
+        Destroy(activeForm.gameObject.GetComponent<AddGizmos>());
+        Destroy(cubeClone.GetComponent<AddGizmos>());
+    }
 }

@@ -214,5 +214,16 @@ public class TransformationsHelper
 
         }
     }
+
+    public void fillHoles(Transform form, Transform cloneForm) {
+        Vector3 targetTranslate = activeForm.localPosition;
+        Vector3 targetTranslateClone = activeForm.localPosition;
+        targetTranslate.z = 3;
+        form.DOLocalMove(targetTranslate, interpolationDuration).SetEase(interpolationEase);
+        targetTranslateClone.x = -3;
+        cloneForm.DOLocalMove(targetTranslateClone, interpolationDuration).SetEase(interpolationEase);
+    }
+
+
 }
 

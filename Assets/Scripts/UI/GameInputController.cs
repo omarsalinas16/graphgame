@@ -144,10 +144,13 @@ public class GameInputController : MonoBehaviour {
 
 	public void runSolveTry() {
 		if (gameController && gameController.solveTryAttempts > 0) {
+            gameController.duplicateCubesAndFillHoles();
+            // TODO: A different implementation
+            /*
 			if (gameController.startPlaneSequence()) {
 				toggleSolveButton(false);
 				toggleTransformButtons(false);
-			}
+			}*/
 		}
 	}
 
