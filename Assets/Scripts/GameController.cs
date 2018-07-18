@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using HoleMaker;
-
+using UnityEngine.UI;
 
 public enum PlaneSequenceStatus {
 	Idle = 0,
@@ -92,6 +92,8 @@ public class GameController : MonoBehaviour {
 
     public TransformationsHelper transformationsHelper { get; private set; }
 
+    public Text resultText;
+
 	private void Awake() {
 		if (Instance != null && Instance != this) {
 			Destroy(gameObject);
@@ -145,12 +147,13 @@ public class GameController : MonoBehaviour {
 	private void handlePlaneSequence() {
 		if (planeSequenceStatus >= PlaneSequenceStatus.Ended) {
 			if (planeSequenceStatus == PlaneSequenceStatus.Ended) {
-				endCurrentLevel();
+                // TODO: This has to be uncomment so the codes works again
+				//endCurrentLevel();
 			} else {
 				solveTryAttempts--;
-
 				Debug.Log("Lose!");
-			}
+                resultText.text = "Lose!";
+            }
 
 			planeSequenceStatus = PlaneSequenceStatus.Idle;
 			issueMovePlane = false;
@@ -271,10 +274,8 @@ public class GameController : MonoBehaviour {
 		if (this.formBehaviour != null) {
 			this.formBehaviour.fadeOut(this.activeForm.gameObject, false);
 		}
-        /*GamePlayed gamePlayed = LevelController.Instance.ActualGame;
-		gamePlayed.Solved = true;
-		GamePlayedDb.Update(gamePlayed);*/
         LevelController.Instance.Win();
+        resultText.text = "Win!";
         Debug.Log("WIN");
 	}
 

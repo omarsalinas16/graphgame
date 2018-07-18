@@ -505,7 +505,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loginForm: {fileID: 1535617753796462, guid: a0c1f628fe4d84540aee40690b1c1385, type: 2}
-  mainMenuForm: {fileID: 1554161324508632, guid: 7e532a85cf856414385db517abc9bf54,
+  mainMenuForm: {fileID: 1010501345241630, guid: 57374291f412b3a4987f9e785c953f16,
     type: 2}
   levelsForm: {fileID: 1803920806808996, guid: 4c046f7babe8e934fbd6c96a5f890465, type: 2}
   historyForm: {fileID: 1793102738693186, guid: 10aa1c94962d8b64cb98d6a841b25a09,

@@ -53,7 +53,7 @@ public class IncrementalInput : MonoBehaviour {
 
     public void incrementPositionZ(int direction)
     {
-        inputField.text = gameController.transformationsHelper.incrementPositionY(direction, getCurrentValue()).ToString();
+        inputField.text = gameController.transformationsHelper.incrementPositionZ(direction, getCurrentValue()).ToString();
     }
 
     private float getCurrentValue(float defualt = 0.0f) {
